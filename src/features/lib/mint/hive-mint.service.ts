@@ -116,9 +116,14 @@ export function isMintable(asset: NftAsset): boolean {
   );
 }
 
-/** Picks the next mintable asset of a collection (lowest file number first). */
+/** Picks a random mintable asset of a collection (mint order is randomized). */
 export function nextMintableAsset(collectionId: string): NftAsset | undefined {
-  return nftAssetsRepository.listByCollection(collectionId).find(isMintable);
+  const mintable = nftAssetsRepository
+    .listByCollection(collectionId)
+    .filter(isMintable);
+  if (mintable.length === 0) return undefined;
+  const index = Math.floor(Math.random() * mintable.length);
+  return mintable[index];
 }
 
 function nextMintedNumber(collectionId: string): number {
