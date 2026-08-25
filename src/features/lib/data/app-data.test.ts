@@ -31,7 +31,7 @@ describe("mock database (LocalStorage driver)", () => {
         filename: "1.png",
         mimeType: "image/png",
         size: 3,
-        attributes: [{ trait: "Background", value: "Blue" }],
+        attributes: [{ trait_type: "Background", value: "Blue" }],
       }),
     );
 

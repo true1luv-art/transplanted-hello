@@ -11,6 +11,7 @@
  */
 import { collectionCreationCost } from "@/lib/config/config";
 import type { TraitLayerConfig } from "@/features/lib/traits/types";
+import type { NFTAttribute } from "@/features/lib/metadata";
 import { logger } from "@/lib/config/logger";
 import { createCollectionDocument } from "@/lib/modules/collections/model.server";
 import { nftCollectionsRepository } from "@/lib/modules/collections/repository.server";

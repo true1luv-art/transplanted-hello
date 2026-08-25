@@ -98,8 +98,8 @@ export async function importCollection(
         mimeType: ref.mimeType,
         size: ref.size,
         attributes: nft.attributes.map((attribute) => ({
-          trait: attribute.trait_type,
-          value: attribute.value,
+          trait_type: attribute.trait_type,
+          value: String(attribute.value),
         })),
         rarityScore: nft.rarityScore,
         rarityRank: nft.rarityRank,
