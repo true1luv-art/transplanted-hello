@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hive } from "@/lib/format";
 import { useAppStore } from "@/features/stores/app-store";
+import { buildTraitProbabilities } from "@/features/lib/traits/collection-frequency";
 
 export const Route = createFileRoute("/nfts/$id")({
   head: () => ({
@@ -37,6 +38,8 @@ function NftDetail() {
   const listing = useAppStore((s) => s.listings.find((l) => l.nftId === id));
   const collection = useAppStore((s) => s.collections.find((c) => c.id === nft?.collectionId));
   const activities = useAppStore((s) => s.activities);
+  const allNfts = useAppStore((s) => s.nfts);
+  const nftAssets = useAppStore((s) => s.nftAssets);
   const user = useAppStore((s) => s.user);
   const cancelListing = useAppStore((s) => s.cancelListing);
   const transferNFT = useAppStore((s) => s.transferNFT);
@@ -47,6 +50,21 @@ function NftDetail() {
   const [transferring, setTransferring] = useState(false);
 
   const history = useMemo(() => activities.filter((a) => a.nftId === id), [activities, id]);
+
+  // Trait rarity for imported/chain-minted tokens comes from observed
+  // frequencies inside the collection, not from creator weights.
+  const probabilities = useMemo(() => {
+    const collectionId = nft?.collectionId;
+    if (!collectionId) return undefined;
+    const population = [
+      ...allNfts.filter((n) => n.collectionId === collectionId),
+      ...nftAssets.filter(
+        (a) => a.collectionId === collectionId && !allNfts.some((n) => n.id === a.id),
+      ),
+    ];
+    return buildTraitProbabilities(population);
+  }, [allNfts, nftAssets, nft?.collectionId]);
+
 
   if (!nft) {
     return (
@@ -207,7 +225,7 @@ function NftDetail() {
               <TabsTrigger value="blockchain">Blockchain</TabsTrigger>
             </TabsList>
             <TabsContent value="attributes" className="mt-4">
-              <AttributesGrid nft={nft} />
+              <AttributesGrid nft={nft} probabilities={probabilities} />
             </TabsContent>
             <TabsContent value="history" className="mt-4">
               <ActivityFeed activities={history} />
