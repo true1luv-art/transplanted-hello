@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeftRight, BadgeCheck, Crown, Loader2, Tag } from "lucide-react";
+import { ArrowLeftRight, BadgeCheck, Loader2, Tag, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 import { ActivityFeed } from "@/components/ActivityFeed";
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hive } from "@/lib/format";
 import { useAppStore } from "@/features/stores/app-store";
 import { buildTraitProbabilities } from "@/features/lib/traits/collection-frequency";
+import { calculateMaxRarityScore } from "@/features/lib/traits/rarity";
 
 export const Route = createFileRoute("/nfts/$id")({
   head: () => ({
@@ -64,6 +65,22 @@ function NftDetail() {
     ];
     return buildTraitProbabilities(population);
   }, [allNfts, nftAssets, nft?.collectionId]);
+
+  // Theoretical rarity ceiling for the collection, used to display
+  // "score out of max" in the header.
+  const maxScore = useMemo(() => {
+    if (!nft) return 0;
+    if (collection?.traitLayers?.length) {
+      return calculateMaxRarityScore(collection.traitLayers);
+    }
+    const population = [
+      ...allNfts.filter((n) => n.collectionId === nft.collectionId),
+      ...nftAssets.filter(
+        (a) => a.collectionId === nft.collectionId && !allNfts.some((n) => n.id === a.id),
+      ),
+    ];
+    return population.reduce((max, item) => Math.max(max, item.rarityScore ?? 0), 0);
+  }, [collection, nft, allNfts, nftAssets]);
 
 
   if (!nft) {
@@ -134,8 +151,8 @@ function NftDetail() {
                 Rank #{nft.rarityRank}
               </span>
               <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                <Crown className="size-4 text-primary" />
-                {collection?.creatorFee ?? 0}%
+                <Trophy className="size-4 text-primary" />
+                {nft.rarityScore.toFixed(0)} / {maxScore.toFixed(0)} pts
               </span>
               <span className="ml-auto text-muted-foreground">
                 Owned by: <span className="text-foreground">@{nft.owner}</span>
