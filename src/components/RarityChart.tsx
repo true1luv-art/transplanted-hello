@@ -46,7 +46,7 @@ export function RarityChart({
     }
 
     const layerKeys = new Set([...configuredLayers.keys(), ...counts.keys()]);
-    return [...layerKeys].map((layerKey) => {
+    const built = [...layerKeys].map((layerKey) => {
       const layer = configuredLayers.get(layerKey);
       const observed = counts.get(layerKey) ?? new Map();
       const probabilities = layer ? normalizedProbabilities(layer.values) : new Map<string, number>();
