@@ -333,7 +333,13 @@ export async function mintNftAsset(input: MintNftAssetInput): Promise<MintNftAss
     let issued: Awaited<ReturnType<typeof issueNftOnHive>>;
     try {
       issued = await issueNftOnHive({
-        data: { collection: collection.name, metadata: metadataString, to: account },
+        data: {
+          collection: collection.name,
+          // The CREATOR collection symbol (e.g. "OO"), not the platform symbol.
+          collectionSymbol: symbol,
+          metadataUri,
+          to: account,
+        },
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Hive issuance failed";
