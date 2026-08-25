@@ -1,10 +1,6 @@
 import type { HiveNftProperties } from "@/lib/chain/nft-properties";
 import type { GeneratedTrait } from "@/features/lib/traits/types";
-
-export interface NFTAttribute {
-  trait: string;
-  value: string | number;
-}
+import type { NFTAttribute } from "@/features/lib/metadata";
 
 export type NFTStatus = "Owned" | "Listed";
 
