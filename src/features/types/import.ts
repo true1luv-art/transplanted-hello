@@ -1,6 +1,6 @@
 import type { UploadState } from "@/features/lib/import/pipeline";
 import type { ImportReport } from "@/features/lib/import/types";
-import type { CollectionTraitValue } from "@/features/lib/storage/collection-manifest";
+import type { CollectionTraitValue } from "@/features/lib/generator/metadata";
 import type { Collection } from "@/features/types/domain/collections";
 
 /** Application-level contract for the "import collection" use case. */

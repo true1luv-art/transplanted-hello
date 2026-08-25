@@ -29,10 +29,8 @@ import {
   type ZipSource,
 } from "./zip";
 import type { ImportIssue, ImportReport, ParsedMetadataRecord } from "./types";
-import {
-  normalizeTraitDefinitions,
-  type CollectionTraitValue,
-} from "@/features/lib/storage/collection-manifest";
+import { normalizeTraitDefinitions } from "@/features/lib/storage/collection-manifest";
+import type { CollectionTraitValue } from "@/features/lib/generator/metadata";
 
 /* ------------------------------------------------------------------ */
 /* collection metadata archive                                         */

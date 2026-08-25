@@ -8,10 +8,8 @@
  * Nothing here generates NFTs — the records already exist.
  */
 import { getStorageProvider } from "@/features/lib/storage/storage";
-import {
-  buildCollectionManifest,
-  type CollectionTraitValue,
-} from "@/features/lib/storage/collection-manifest";
+import { buildCollectionManifest } from "@/features/lib/storage/collection-manifest";
+import type { CollectionTraitValue } from "@/features/lib/generator/metadata";
 import { mimeFromFilename } from "@/features/lib/storage/validation";
 import {
   batchImagesNamespace,
