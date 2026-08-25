@@ -2,7 +2,7 @@ import type { NFTAttribute } from "@/features/lib/metadata";
 
 import { resolveIpfsUrl } from "./ipfs-uri";
 
-/** Normalizes both OpenSea (`trait_type`) and app (`trait`) attribute shapes. */
+/** Validates the canonical `{ trait_type, value }` attribute array. */
 export function normalizeNftAttributes(value: unknown): NFTAttribute[] {
   if (!Array.isArray(value)) return [];
 
@@ -10,7 +10,7 @@ export function normalizeNftAttributes(value: unknown): NFTAttribute[] {
   for (const entry of value) {
     if (!entry || typeof entry !== "object") continue;
     const record = entry as Record<string, unknown>;
-    const traitValue = record["trait"] ?? record["trait_type"];
+    const traitValue = record["trait_type"];
     const valueValue = record["value"];
     if (typeof traitValue !== "string" || !traitValue.trim()) continue;
     if (typeof valueValue !== "string" && typeof valueValue !== "number") continue;
