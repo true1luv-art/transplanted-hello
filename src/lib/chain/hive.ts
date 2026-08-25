@@ -550,11 +550,17 @@ export function getEngineApi(): string {
   return (config.hive.marketApi ?? "").replace(/\/+$/, "");
 }
 
-/** Builds the `nft.issue` contract call for a single token. */
+/**
+ * Builds the `nft.issue` contract call for a single token.
+ *
+ * `contractPayload.symbol` is the PLATFORM Hive Engine NFT symbol; the creator
+ * collection symbol lives in `properties.symbol`.
+ */
 export function buildNftIssueCall(params: NftIssuanceParams): HiveEngineContractCall {
   const symbol = params.symbol.trim().toUpperCase();
   const to = (params.to ?? params.account).trim().toLowerCase();
   assertCanonicalProperties(params.properties as unknown as Record<string, unknown>);
+  assertPropertyLimits(params.properties);
   return {
     contractName: "nft",
     contractAction: "issue",
