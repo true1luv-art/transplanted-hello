@@ -796,18 +796,40 @@ export interface IssuerNftIssuanceResult extends NftIssuanceOutcome {
 export async function issueNftAsIssuer(
   params: IssuerNftIssuanceParams,
 ): Promise<IssuerNftIssuanceResult> {
-  const { account: issuer, key, symbol } = getIssuerCredentials();
+  // `symbol` here is the PLATFORM Hive Engine NFT contract symbol (TESTNFTS).
+  const { account: issuer, key, symbol: platformSymbol } = getIssuerCredentials();
   const to = params.to.trim().toLowerCase() || issuer;
   const collection = params.collection.trim();
+  const collectionSymbol = params.collectionSymbol.trim().toUpperCase();
+  const metadataUri = params.metadataUri.trim();
   if (!collection) {
-    throw new HiveChainError("NOT_CONFIGURED", "No application collection name for the issuance");
+    throw new HiveChainError("NOT_CONFIGURED", "No creator collection name for the issuance");
   }
-  if (!params.metadata) {
+  if (!collectionSymbol) {
+    throw new HiveChainError("NOT_CONFIGURED", "No creator collection symbol for the issuance");
+  }
+  if (!metadataUri) {
     throw new HiveChainError("MALFORMED_RESPONSE", "NFT metadata property is empty");
   }
+  if (!isMetadataUri(metadataUri)) {
+    throw new HiveChainError(
+      "MALFORMED_RESPONSE",
+      "NFT metadata property must be the IPFS URI of the metadata JSON",
+    );
+  }
 
-  const properties: HiveNftIssueProperties = { collection, symbol, metadata: params.metadata };
-  const issuance = prepareNftIssuance({ account: issuer, to, symbol, properties });
+  const properties: HiveNftIssueProperties = {
+    collection,
+    symbol: collectionSymbol,
+    metadata: metadataUri,
+  };
+  // contractPayload.symbol = platform NFT contract; properties.symbol = creator collection.
+  const issuance = prepareNftIssuance({
+    account: issuer,
+    to,
+    symbol: platformSymbol,
+    properties,
+  });
 
   let signingKey: PrivateKey;
   try {
