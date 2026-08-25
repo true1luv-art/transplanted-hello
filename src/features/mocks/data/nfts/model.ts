@@ -84,12 +84,7 @@ export function buildNFT(params: {
     properties: buildNftProperties({
       collection: collection.name,
       symbol: collection.symbol,
-      metadata: {
-        name: `${adj} ${noun} #${fileNumber}`,
-        description: `Rank #${token.rarityRank} of ${rankTotal} in ${collection.name}.`,
-        image: `${collection.metadataBaseUri}${fileNumber}.json`,
-        attributes: traitsToAttributes(token.traits),
-      },
+      metadataUri: `${collection.metadataBaseUri}${fileNumber}.json`,
     }),
   };
 }
