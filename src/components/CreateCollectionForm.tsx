@@ -170,6 +170,13 @@ export function CreateCollectionForm() {
           collectionImageUrl: coverFile.previewUrl,
           report,
           imageFiles: imageFiles.current,
+          manifest: collectionMeta
+            ? {
+                width: collectionMeta.width ?? undefined,
+                height: collectionMeta.height ?? undefined,
+                traits: collectionMeta.traits,
+              }
+            : undefined,
           fallbackImage,
           balance,
         },

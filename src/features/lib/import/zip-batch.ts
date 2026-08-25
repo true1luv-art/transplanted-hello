@@ -29,6 +29,10 @@ import {
   type ZipSource,
 } from "./zip";
 import type { ImportIssue, ImportReport, ParsedMetadataRecord } from "./types";
+import {
+  normalizeTraitDefinitions,
+  type CollectionTraitValue,
+} from "@/features/lib/storage/collection-manifest";
 
 /* ------------------------------------------------------------------ */
 /* collection metadata archive                                         */
@@ -45,11 +49,18 @@ export interface CollectionMetadataImport {
   description: string;
   image: string;
   externalUrl: string;
+  /** Canvas size declared by the manifest. */
+  width: number | null;
+  height: number | null;
+  /** Complete configured trait system declared by the manifest. */
+  traits: Record<string, CollectionTraitValue[]> | undefined;
   issues: ImportIssue[];
   valid: boolean;
 }
 
 const str = (value: unknown) => (typeof value === "string" ? value.trim() : "");
+const num = (value: unknown) =>
+  typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null;
 
 /** Locates and parses `metadata/metadata.json` inside the collection archive. */
 export async function readCollectionMetadataZip(
@@ -64,6 +75,9 @@ export async function readCollectionMetadataZip(
     description: "",
     image: "",
     externalUrl: "",
+    width: null,
+    height: null,
+    traits: undefined,
     issues,
     valid: false,
   });
@@ -145,6 +159,9 @@ export async function readCollectionMetadataZip(
     description: str(record["description"]),
     image: str(record["image"] ?? record["image_url"] ?? record["banner"]),
     externalUrl: str(record["external_url"] ?? record["externalUrl"]),
+    width: num(record["width"]),
+    height: num(record["height"]),
+    traits: normalizeTraitDefinitions(record["traits"]),
     issues,
     valid: true,
   };

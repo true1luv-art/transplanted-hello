@@ -46,6 +46,9 @@ export async function importCollection(
       collectionImage: input.collectionImage,
       imageFiles: input.imageFiles,
       nfts: report.nfts,
+      width: input.manifest?.width,
+      height: input.manifest?.height,
+      traits: input.manifest?.traits,
     },
     options.onUploadState,
   );

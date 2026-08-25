@@ -8,7 +8,10 @@
  * Nothing here generates NFTs — the records already exist.
  */
 import { getStorageProvider } from "@/features/lib/storage/storage";
-import { buildCollectionMetadata } from "@/features/lib/storage/metadata";
+import {
+  buildCollectionManifest,
+  type CollectionTraitValue,
+} from "@/features/lib/storage/collection-manifest";
 import { mimeFromFilename } from "@/features/lib/storage/validation";
 import {
   batchImagesNamespace,
@@ -167,7 +170,15 @@ export interface UploadImportInput {
   /** Uploaded NFT images keyed by their original filename. */
   imageFiles: Map<string, File>;
   nfts: ImportedNft[];
+  /** Canvas size from the imported collection manifest. */
+  width?: number | undefined;
+  height?: number | undefined;
+  /** Complete configured trait system from the imported manifest. */
+  traits?: Record<string, CollectionTraitValue[]> | undefined;
 }
+
+/** Used when the imported manifest carried no canvas size. */
+const DEFAULT_CANVAS = 512;
 
 const toInput = async (file: File, filename = file.name): Promise<StorageFileInput> => ({
   filename,
@@ -285,17 +296,26 @@ export async function uploadImportedCollection(
     completedMetadata += batchNfts.length;
   }
 
-  // 3. Collection-level metadata (kept strictly separate from NFT metadata).
+  // 3. Collection manifest: the COMPLETE self-contained description of the
+  // collection — traits with weights plus every NFT's full metadata. No CID
+  // references inside `nfts[]`, and no launch/application state.
   const collectionMetadata = await storage.uploadJson(
     collectionMetadataFilename(input.creator, input.symbol),
-    buildCollectionMetadata({
+    buildCollectionManifest({
       name: input.name,
-      symbol: input.symbol,
       description: input.description,
-      imageUri: collectionImage.uri,
-      maxSupply: input.maxSupply,
-      mintPrice: input.mintPrice,
-      creator: input.creator,
+      width: input.width ?? DEFAULT_CANVAS,
+      height: input.height ?? DEFAULT_CANVAS,
+      traits: input.traits,
+      nfts: ordered.map((nft) => ({
+        name: nft.name,
+        description: nft.description || input.description,
+        image: nft.raw["image"] as string || nft.image,
+        attributes: nft.attributes.map((attribute) => ({
+          trait_type: attribute.trait_type,
+          value: String(attribute.value),
+        })),
+      })),
     }),
     { pin: true },
   );
