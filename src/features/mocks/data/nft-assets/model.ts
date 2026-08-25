@@ -17,7 +17,6 @@ export interface CreateNftAssetInput {
   metadataRootCid?: string | undefined;
   imageUri?: string | undefined;
   metadataUri?: string | undefined;
-  dna?: string | undefined;
   rarityScore?: number | undefined;
   rarityRank?: number | undefined;
   rarityRankTotal?: number | undefined;
@@ -36,7 +35,7 @@ export function buildNftAsset(input: CreateNftAssetInput): NftAsset {
     NFTMintId: input.NFTMintId,
     // Hive assigns this at mint time; a prepared asset is always unminted.
     NFTokenID: null,
-    NftMintedNumber: null,
+    NFTMintedNumber: null,
     // Chain-shaped properties: the creator collection symbol plus the IPFS URI
     // of the metadata document (never the metadata itself).
     properties: buildNftProperties({
@@ -55,9 +54,7 @@ export function buildNftAsset(input: CreateNftAssetInput): NftAsset {
     metadataRootCid: input.metadataRootCid,
     imageUri: input.imageUri,
     metadataUri: input.metadataUri,
-    cid: input.imageCid,
     attributes: input.attributes,
-    dna: input.dna,
     rarityScore: input.rarityScore,
     rarityRank: input.rarityRank,
     rarityRankTotal: input.rarityRankTotal,

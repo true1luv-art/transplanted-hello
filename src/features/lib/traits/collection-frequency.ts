@@ -5,7 +5,7 @@
  * trait's probability is derived from how often that value occurs in the
  * collection (count / total). Display only — never used for generation.
  */
-import type { NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
 
 export const traitProbabilityKey = (trait: string, value: string | number) =>
   `${trait}\u0000${String(value)}`;
@@ -19,7 +19,7 @@ export function buildTraitProbabilities(
     if (!item.attributes?.length) continue;
     total += 1;
     for (const attribute of item.attributes) {
-      const key = traitProbabilityKey(attribute.trait, attribute.value);
+      const key = traitProbabilityKey(attribute.trait_type, attribute.value);
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
   }

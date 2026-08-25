@@ -54,10 +54,10 @@ export function AttributesGrid({
   return (
     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {nft.attributes.map((a) => {
-        const probability = probabilityFor(a.trait, a.value);
+        const probability = probabilityFor(a.trait_type, a.value);
         return (
-          <li key={a.trait} className="rounded-lg border border-border bg-surface px-3 py-2.5">
-            <p className="text-[11px] tracking-wider text-muted-foreground uppercase">{a.trait}</p>
+          <li key={a.trait_type} className="rounded-lg border border-border bg-surface px-3 py-2.5">
+            <p className="text-[11px] tracking-wider text-muted-foreground uppercase">{a.trait_type}</p>
             <p className="mt-0.5 font-display text-sm font-semibold">{String(a.value)}</p>
             {probability > 0 && (
               <div className="mt-2 flex items-center justify-between gap-2">
@@ -103,7 +103,7 @@ export function BlockchainRows({ nft }: { nft: NFT }) {
       <Row label="Token ID" value={nft.tokenId === null ? "Not minted" : String(nft.tokenId)} mono />
       <Row
         label="Mint number"
-        value={nft.NftMintedNumber === null ? "Not minted" : `#${nft.NftMintedNumber}`}
+        value={nft.NFTMintedNumber === null ? "Not minted" : `#${nft.NFTMintedNumber}`}
       />
       <Row label="File number" value={`#${nft.mintNumber}`} />
       <Row label="Owner" value={`@${nft.owner}`} />

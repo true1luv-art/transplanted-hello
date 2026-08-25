@@ -2,7 +2,8 @@ import { generateArtwork, hashString, mulberry32 } from "@/lib/art";
 import { buildNftProperties } from "@/lib/chain/nft-properties";
 import type { GeneratedToken, GeneratedTrait } from "@/features/lib/traits/types";
 import type { Collection } from "@/features/types/domain/collections";
-import type { NFT, NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
+import type { NFT } from "@/features/types/domain/nfts";
 
 const ADJECTIVES = ["Ancient", "Neon", "Prime", "Shadow", "Golden", "Frozen", "Solar"];
 
@@ -21,7 +22,7 @@ export function rarityMultiplier(rank: number, total: number): number {
 
 /** Generated traits -> metadata attributes. Attributes always mirror traits. */
 export function traitsToAttributes(traits: GeneratedTrait[]): NFTAttribute[] {
-  return traits.map((trait) => ({ trait: trait.layerName, value: trait.traitValueName }));
+  return traits.map((trait) => ({ trait_type: trait.layerName, value: trait.traitValueName }));
 }
 
 /**
@@ -37,7 +38,7 @@ export function buildNFT(params: {
   rankTotal: number;
   seedKey: string;
   /** Chronological mint number inside the collection. `null` for previews. */
-  NftMintedNumber?: number | null;
+  NFTMintedNumber?: number | null;
   /** REAL blockchain token id read back from the chain. `null` if unminted. */
   tokenId?: number | null;
 }): NFT {
@@ -80,7 +81,7 @@ export function buildNFT(params: {
     estimatedValue: value,
     createdAt,
     status: "Owned",
-    NftMintedNumber: params.NftMintedNumber ?? null,
+    NFTMintedNumber: params.NFTMintedNumber ?? null,
     properties: buildNftProperties({
       collection: collection.name,
       symbol: collection.symbol,

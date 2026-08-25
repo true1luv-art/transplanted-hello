@@ -63,7 +63,7 @@ export const importedNftSchema = z.object({
   attributes: z
     .array(
       z.object({
-        trait: z.string().trim().min(1).max(120),
+        trait_type: z.string().trim().min(1).max(120),
         value: z.union([z.string().max(200), z.number()]),
       }),
     )
@@ -71,7 +71,6 @@ export const importedNftSchema = z.object({
     .default([]),
   rarityScore: z.number().nonnegative(),
   rarityRank: z.number().int().min(0),
-  sourceMetadata: z.record(z.string(), z.unknown()).default({}),
 });
 
 export const createCollectionSchema = z

@@ -1,5 +1,5 @@
 import type { GeneratedTrait } from "@/features/lib/traits/types";
-import type { NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
 
 /**
  * UNMINTED NFTs of a collection.
@@ -42,7 +42,6 @@ export interface NftAssetDocument {
   rarityRank?: number | undefined;
   rarityRankTotal?: number | undefined;
   /** untouched creator metadata for imported collections */
-  sourceMetadata?: Record<string, unknown> | undefined;
   imported?: boolean | undefined;
   /* ---- lifecycle ---------------------------------------------------- */
   status: NftAssetStatus;
@@ -71,7 +70,6 @@ export interface CreateNftAssetInput {
   rarityScore?: number | undefined;
   rarityRank?: number | undefined;
   rarityRankTotal?: number | undefined;
-  sourceMetadata?: Record<string, unknown> | undefined;
   imported?: boolean | undefined;
   status?: NftAssetStatus | undefined;
 }

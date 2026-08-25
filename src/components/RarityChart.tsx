@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Loader2 } from "lucide-react";
 
 import { normalizedProbabilities, type TraitLayerConfig } from "@/features/lib/traits";
-import type { NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
 import { cn } from "@/lib/utils";
 
 const pct = (value: number) => `${(value * 100).toFixed(1)}%`;
@@ -33,7 +33,7 @@ export function RarityChart({
 
     for (const attributes of mintedAttributes) {
       for (const attribute of attributes) {
-        const layerKey = normalized(attribute.trait);
+        const layerKey = normalized(attribute.trait_type);
         const valueKey = normalized(attribute.value);
         const values = counts.get(layerKey) ?? new Map();
         const current = values.get(valueKey);

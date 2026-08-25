@@ -11,6 +11,7 @@
  */
 import { collectionCreationCost } from "@/lib/config/config";
 import type { TraitLayerConfig } from "@/features/lib/traits/types";
+import type { NFTAttribute } from "@/features/lib/metadata";
 import { logger } from "@/lib/config/logger";
 import { createCollectionDocument } from "@/lib/modules/collections/model.server";
 import { nftCollectionsRepository } from "@/lib/modules/collections/repository.server";
@@ -45,11 +46,10 @@ export interface ImportedNftRecord {
   image: string;
   imageUri: string;
   metadataUri: string;
-  attributes: { trait: string; value: string | number }[];
+  attributes: NFTAttribute[];
   rarityScore: number;
   rarityRank: number;
   /** untouched source metadata document */
-  sourceMetadata: Record<string, unknown>;
 }
 
 export interface CollectionAssetBundle {
@@ -191,7 +191,6 @@ export async function prepareCollection(
               rarityScore: imported.rarityScore,
               rarityRank: imported.rarityRank,
               rarityRankTotal: importedTotal,
-              sourceMetadata: imported.sourceMetadata,
               imported: true,
             }
           : {}),

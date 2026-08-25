@@ -1,5 +1,5 @@
 import type { GeneratedTrait } from "@/features/lib/traits/types";
-import type { NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
 
 export type NftDocumentStatus = "owned" | "listed" | "burned";
 
@@ -28,7 +28,6 @@ export interface NftDocument {
   /** true when the record came from an imported collection package. */
   imported?: boolean | undefined;
   /** Original creator metadata, preserved verbatim. Never rewritten. */
-  sourceMetadata?: Record<string, unknown> | undefined;
   mintNumber: number;
   /** Mint number inside the virtual collection. */
   NFTMintId: number;

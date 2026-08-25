@@ -145,8 +145,8 @@ describe("uploadImportedCollection", () => {
     const metadata = JSON.parse(String(metadataFile?.content)) as Record<string, unknown>;
     expect(metadata["image"]).toBe(first?.imageUri);
     expect(metadata["symbol"]).toBeUndefined();
-    expect(metadata["attributes"]).toEqual([
-      { trait_type: "Fur", value: "Gold", name: "Golden Fur", weight: 25 },
-    ]);
+    // Canonical NFT metadata only: creator extras are dropped.
+    expect(metadata["attributes"]).toEqual([{ trait_type: "Fur", value: "Gold" }]);
+    expect(Object.keys(metadata).sort()).toEqual(["attributes", "description", "image", "name"]);
   });
 });

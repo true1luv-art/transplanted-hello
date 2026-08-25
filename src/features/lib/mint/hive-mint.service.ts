@@ -20,7 +20,8 @@ import { mintTransactionsRepository } from "@/features/mocks/data/mint-transacti
 import { usersRepository } from "@/features/mocks/data/users/repository";
 import type { Collection } from "@/features/types/domain/collections";
 import type { NftAsset } from "@/features/types/domain/nft-assets";
-import type { NFT, NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
+import type { NFT } from "@/features/types/domain/nfts";
 import type { MintProgress, MintTransactionRecord } from "@/features/types/domain/mint";
 
 export class MintError extends Error {
@@ -109,7 +110,7 @@ export async function loadNftMetadata(metadataUri: string): Promise<IpfsNftMetad
 export function isMintable(asset: NftAsset): boolean {
   return (
     asset.status !== "minted" &&
-    asset.NftMintedNumber === null &&
+    asset.NFTMintedNumber === null &&
     asset.NFTokenID === null &&
     !mintTransactionsRepository.activeForAsset(asset.id)
   );
@@ -124,7 +125,7 @@ function nextMintedNumber(collectionId: string): number {
   const numbers = nftsRepository
     .list()
     .filter((nft) => nft.collectionId === collectionId)
-    .map((nft) => nft.NftMintedNumber ?? 0);
+    .map((nft) => nft.NFTMintedNumber ?? 0);
   return Math.max(0, ...numbers) + 1;
 }
 
@@ -134,25 +135,25 @@ function toMintedNft(params: {
   metadata: IpfsNftMetadata;
   owner: string;
   tokenId: number;
-  NftMintedNumber: number;
+  NFTMintedNumber: number;
   txId: string;
   properties: NftAsset["properties"];
 }): NFT {
-  const { asset, collection, metadata, owner, tokenId, NftMintedNumber, txId, properties } = params;
+  const { asset, collection, metadata, owner, tokenId, NFTMintedNumber, txId, properties } = params;
   return {
     id: asset.id,
     collectionId: collection.id,
     collectionName: collection.name,
     tokenId,
-    NftMintedNumber,
+    NFTMintedNumber,
     properties,
     name: metadata.name || asset.name,
     description: metadata.description || asset.description,
     image: asset.imageUri ?? metadata.image ?? collection.image,
     traits: (asset.attributes ?? []).map((attribute) => ({
-      layerId: attribute.trait,
-      layerName: attribute.trait,
-      traitValueId: `${attribute.trait}:${attribute.value}`,
+      layerId: attribute.trait_type,
+      layerName: attribute.trait_type,
+      traitValueId: `${attribute.trait_type}:${attribute.value}`,
       traitValueName: String(attribute.value),
       weight: 0,
       probability: 0,
@@ -196,7 +197,7 @@ function commitMint(params: {
   const existing = nftsRepository.list().find((nft) => nft.id === asset.id);
   if (existing) return existing;
 
-  const NftMintedNumber = nextMintedNumber(collection.id);
+  const NFTMintedNumber = nextMintedNumber(collection.id);
   const properties =
     params.properties ??
     buildNftProperties({
@@ -211,7 +212,7 @@ function commitMint(params: {
     metadata,
     owner,
     tokenId,
-    NftMintedNumber,
+    NFTMintedNumber,
     txId,
     properties,
   });
@@ -220,7 +221,7 @@ function commitMint(params: {
   // The asset row is preserved and marked consumed — never deleted.
   nftAssetsRepository.patch(asset.id, {
     status: "minted",
-    NftMintedNumber,
+    NFTMintedNumber,
     NFTokenID: tokenId,
     properties,
   });

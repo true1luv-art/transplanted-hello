@@ -21,7 +21,7 @@ import {
 } from "@/features/lib/generator/engine";
 import { splitBatches } from "@/features/lib/generator/batching";
 import { buildExportPackage } from "@/features/lib/generator/export";
-import { nftMetadataDocument } from "@/features/lib/generator/metadata";
+import { toNftMetadata } from "@/features/lib/metadata";
 import {
   collectionImageFilename,
   collectionMetadataFilename,
@@ -214,7 +214,7 @@ test("validation reports insufficient combinations as a blocking error", () => {
 
 test("NFT metadata contains only name, description, image and attributes", () => {
   const result = generateCollection({ project: project({ supply: 12 }), rand: prng(9) });
-  const doc = nftMetadataDocument(result.nfts[0]!) as unknown as Record<string, unknown>;
+  const doc = toNftMetadata(result.nfts[0]!) as unknown as Record<string, unknown>;
   assert(
     Object.keys(doc).sort().join(",") === "attributes,description,image,name",
     `unexpected keys: ${Object.keys(doc).join(",")}`,

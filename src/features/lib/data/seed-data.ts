@@ -7,7 +7,8 @@ import type { GeneratedToken, GeneratedTrait } from "@/features/lib/traits/types
 import type { Activity, Transaction } from "@/features/types/domain/activity";
 import type { Collection } from "@/features/types/domain/collections";
 import type { Listing } from "@/features/types/domain/marketplace";
-import type { NFT, NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
+import type { NFT } from "@/features/types/domain/nfts";
 import type { User } from "@/features/types/domain/users";
 import { hiveAvatarUrl } from "@/lib/chain/identity";
 
@@ -203,7 +204,7 @@ export function rarityMultiplier(rank: number, total: number): number {
 
 /** Generated traits -> metadata attributes. Attributes always mirror traits. */
 export function traitsToAttributes(traits: GeneratedTrait[]): NFTAttribute[] {
-  return traits.map((trait) => ({ trait: trait.layerName, value: trait.traitValueName }));
+  return traits.map((trait) => ({ trait_type: trait.layerName, value: trait.traitValueName }));
 }
 
 /**
@@ -219,7 +220,7 @@ export function buildNFT(params: {
   rankTotal: number;
   seedKey: string;
   /** Chronological mint number inside the collection. */
-  NftMintedNumber: number;
+  NFTMintedNumber: number;
   /** REAL blockchain token id (global across the platform collection). */
   tokenId: number;
 }): NFT {
@@ -261,7 +262,7 @@ export function buildNFT(params: {
     estimatedValue: value,
     createdAt,
     status: "Owned",
-    NftMintedNumber: params.NftMintedNumber,
+    NFTMintedNumber: params.NFTMintedNumber,
     properties: buildNftProperties({
       collection: collection.name,
       symbol: collection.symbol,
@@ -336,7 +337,7 @@ export function createSeedData(): SeedData {
           rankTotal: poolSize,
           createdAt: ago(Math.floor(rand() * 40 * DAY) + HOUR),
           seedKey: `${collection.id}-seed-${i}`,
-          NftMintedNumber: ++mintedInCollection,
+          NFTMintedNumber: ++mintedInCollection,
           tokenId: ++lastChainTokenId,
         }),
       );
@@ -353,7 +354,7 @@ export function createSeedData(): SeedData {
           token: rarest,
           rankTotal: poolSize,
           createdAt: ago(3 * DAY),
-          NftMintedNumber: ++mintedInCollection,
+          NFTMintedNumber: ++mintedInCollection,
           tokenId: ++lastChainTokenId,
           seedKey: "showcase-1842",
         });

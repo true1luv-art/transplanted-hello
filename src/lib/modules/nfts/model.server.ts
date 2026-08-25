@@ -6,7 +6,8 @@ import { generateTraits } from "@/features/lib/traits/generator";
 import { calculateRarityScore } from "@/features/lib/traits/rarity";
 import { DEFAULT_TRAIT_LAYERS } from "@/features/lib/traits/presets";
 import type { GeneratedTrait } from "@/features/lib/traits/types";
-import type { NFT, NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
+import type { NFT } from "@/features/types/domain/nfts";
 import type { CollectionDocument } from "../collections/types.server";
 import type { NftAssetDocument } from "../nft-assets/types.server";
 import type { NftDocument, NftDocumentStatus } from "./types.server";
@@ -33,7 +34,6 @@ const NftSchema = new Schema<NftDocument>(
     image: { type: String, required: true },
     owner: { type: String, required: true },
     imported: { type: Boolean },
-    sourceMetadata: { type: Schema.Types.Mixed },
     mintNumber: { type: Number, required: true },
     NFTMintId: { type: Number, required: true },
     NFTokenID: { type: Number, default: null },
@@ -90,7 +90,7 @@ export function hiveNftId(symbol: string, tokenId: number): string {
 export const HELD_STATUSES: readonly NftDocumentStatus[] = ["owned", "listed"];
 
 function attributesFromTraits(traits: GeneratedTrait[]): NFTAttribute[] {
-  return traits.map((trait) => ({ trait: trait.layerName, value: trait.traitValueName }));
+  return traits.map((trait) => ({ trait_type: trait.layerName, value: trait.traitValueName }));
 }
 
 export interface CreateNftInput {
@@ -172,7 +172,6 @@ export function createNftDocumentFromAsset(input: CreateNftFromAssetInput): NftD
     image: asset.image ?? asset.imageUri,
     owner,
     imported: asset.imported,
-    sourceMetadata: asset.sourceMetadata,
     mintNumber,
     NFTMintId: asset.NFTMintId,
     NFTokenID: asset.NFTokenID ?? null,
@@ -224,7 +223,7 @@ export function toNftView(doc: NftDocument): NFT {
     estimatedValue: doc.estimatedValue,
     createdAt: doc.createdAt,
     status: doc.isListed ? "Listed" : "Owned",
-    NftMintedNumber: doc.NFTokenID ?? null,
+    NFTMintedNumber: doc.NFTokenID ?? null,
     properties: buildNftProperties({
       collection: doc.collectionName,
       symbol: doc.collectionName,

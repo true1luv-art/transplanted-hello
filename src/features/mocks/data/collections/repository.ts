@@ -40,25 +40,4 @@ export const collectionsRepository = {
     }));
   },
 
-  /** Imported, pre-authored tokens waiting to be handed out on mint. */
-  setUnminted(collectionId: string, nfts: NFT[]): void {
-    appData.update((s) => ({ unminted: { ...s.unminted, [collectionId]: nfts } }));
-  },
-
-  unmintedPool(collectionId: string): NFT[] {
-    return appData.read().unminted[collectionId] ?? [];
-  },
-
-  claimUnminted(collectionId: string, index: number): NFT | undefined {
-    const pool = collectionsRepository.unmintedPool(collectionId);
-    const picked = pool[index];
-    if (!picked) return undefined;
-    appData.update((s) => ({
-      unminted: {
-        ...s.unminted,
-        [collectionId]: (s.unminted[collectionId] ?? []).filter((_, i) => i !== index),
-      },
-    }));
-    return picked;
-  },
 };

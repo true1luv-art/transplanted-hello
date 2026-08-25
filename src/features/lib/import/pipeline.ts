@@ -8,10 +8,8 @@
  * Nothing here generates NFTs — the records already exist.
  */
 import { getStorageProvider } from "@/features/lib/storage/storage";
-import {
-  buildCollectionManifest,
-  type CollectionTraitValue,
-} from "@/features/lib/storage/collection-manifest";
+import { buildCollectionMetadata, type NFTMetadata } from "@/features/lib/metadata";
+import type { TraitDefinition } from "@/features/lib/metadata";
 import { mimeFromFilename } from "@/features/lib/storage/validation";
 import {
   batchImagesNamespace,
@@ -174,11 +172,28 @@ export interface UploadImportInput {
   width?: number | undefined;
   height?: number | undefined;
   /** Complete configured trait system from the imported manifest. */
-  traits?: Record<string, CollectionTraitValue[]> | undefined;
+  traits?: Record<string, TraitDefinition[]> | undefined;
 }
 
 /** Used when the imported manifest carried no canvas size. */
 const DEFAULT_CANVAS = 512;
+
+/** The canonical NFT metadata for an imported token: no extra creator fields. */
+function canonicalNftMetadata(
+  nft: ImportedNft,
+  fallbackDescription: string,
+  imageUri: string,
+): NFTMetadata {
+  return {
+    name: nft.name,
+    description: nft.description || fallbackDescription,
+    image: imageUri,
+    attributes: nft.attributes.map((attribute) => ({
+      trait_type: attribute.trait_type,
+      value: String(attribute.value),
+    })),
+  };
+}
 
 const toInput = async (file: File, filename = file.name): Promise<StorageFileInput> => ({
   filename,
@@ -222,6 +237,8 @@ export async function uploadImportedCollection(
   }
 
   const imageByToken = new Map<number, StorageObject>();
+  /** The canonical NFT metadata object per token — the single source of truth. */
+  const documentByToken = new Map<number, NFTMetadata>();
   const metadataByToken = new Map<number, StorageObject>();
   const imageRoots: string[] = [];
   const metadataRoots: string[] = [];
@@ -265,10 +282,14 @@ export async function uploadImportedCollection(
     const metadataFiles: StorageFileInput[] = batchNfts.map((nft) => {
       const image = imageByToken.get(nft.tokenId);
       if (!image) throw new StorageError(`No uploaded image reference for token #${nft.tokenId}`);
+      // ONE canonical NFT metadata object per token: it is pinned as the
+      // individual JSON and reused verbatim inside the collection manifest.
+      const document = canonicalNftMetadata(nft, input.description, image.uri);
+      documentByToken.set(nft.tokenId, document);
       return {
         filename: nft.sourceFile.split("/").pop() ?? `${nft.tokenId}.json`,
         mimeType: "application/json",
-        content: JSON.stringify({ ...nft.raw, image: image.uri }, null, 2),
+        content: JSON.stringify(document, null, 2),
       };
     });
     const metadataDir = await storage.uploadDirectory(
@@ -301,21 +322,17 @@ export async function uploadImportedCollection(
   // references inside `nfts[]`, and no launch/application state.
   const collectionMetadata = await storage.uploadJson(
     collectionMetadataFilename(input.creator, input.symbol),
-    buildCollectionManifest({
+    buildCollectionMetadata({
       name: input.name,
       description: input.description,
       width: input.width ?? DEFAULT_CANVAS,
       height: input.height ?? DEFAULT_CANVAS,
       traits: input.traits,
-      nfts: ordered.map((nft) => ({
-        name: nft.name,
-        description: nft.description || input.description,
-        image: nft.raw["image"] as string || nft.image,
-        attributes: nft.attributes.map((attribute) => ({
-          trait_type: attribute.trait_type,
-          value: String(attribute.value),
-        })),
-      })),
+      nfts: ordered.map((nft) => {
+        const document = documentByToken.get(nft.tokenId);
+        if (!document) throw new StorageError(`Missing NFT metadata for token #${nft.tokenId}`);
+        return document;
+      }),
     }),
     { pin: true },
   );

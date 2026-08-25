@@ -1,5 +1,5 @@
 import type { HiveNftProperties } from "@/lib/chain/nft-properties";
-import type { NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
 
 /**
  * Prepared, UNMINTED NFT record — the client mirror of the `nft-assets`
@@ -25,7 +25,7 @@ export interface NftAsset {
    * Chronological mint number inside this collection, assigned by the mint
    * queue. `null` for every asset sitting in unminted inventory.
    */
-  NftMintedNumber: number | null;
+  NFTMintedNumber: number | null;
   /** REAL blockchain token id, read back from Hive at mint time. */
   NFTokenID: number | null;
   /** Blockchain-shaped custom properties; `metadata` is a JSON STRING. */
@@ -47,13 +47,10 @@ export interface NftAsset {
   imageUri?: string | undefined;
   /** `ipfs://CID` of the metadata JSON, once uploaded. */
   metadataUri?: string | undefined;
-  /** Legacy alias for `imageCid`. */
-  cid?: string | undefined;
   attributes: NFTAttribute[];
   rarityScore?: number | undefined;
   rarityRank?: number | undefined;
   rarityRankTotal?: number | undefined;
-  dna?: string | undefined;
   status: NftAssetStatus;
   error?: string | undefined;
   createdAt: string;

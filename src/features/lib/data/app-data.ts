@@ -11,7 +11,6 @@
  */
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { DB_VERSION, migrateAppData } from "@/features/lib/data/migrations";
 
 import type { Activity, Transaction } from "@/features/types/domain/activity";
 import type { Collection } from "@/features/types/domain/collections";
@@ -25,6 +24,9 @@ import { CURRENT_USER, createSeedData } from "./seed-data";
 /** Namespace for every LocalStorage key owned by the mock database. */
 export const MOCK_DB_PREFIX = "hivex.mockdb.";
 export const MOCK_DB_KEY = `${MOCK_DB_PREFIX}app-v1`;
+
+/** Canonical schema version. Bump it to reset the development database. */
+export const SCHEMA_VERSION = 1;
 
 export interface AppData {
   user: User | null;
@@ -40,8 +42,6 @@ export interface AppData {
   /** Journal of REAL Hive mint attempts (pending -> confirmed/failed). */
   mintTransactions: MintTransactionRecord[];
   activities: Activity[];
-  /** Unminted imported NFTs, keyed by collection id. */
-  unminted: Record<string, NFT[]>;
   connecting: boolean;
 }
 
@@ -76,7 +76,6 @@ export function createInitialData(): AppData {
     transactions: [],
     mintTransactions: [],
     activities: [],
-    unminted: {},
     connecting: false,
   };
 }
@@ -125,10 +124,10 @@ export const useAppData = create<AppDataStore>()(
     {
       name: MOCK_DB_KEY,
       storage: createJSONStorage(driver),
-      // Data-preserving schema upgrades: older payloads are transformed,
-      // never wiped. See lib/data/migrations.ts.
-      version: DB_VERSION,
-      migrate: (persisted, fromVersion) => migrateAppData(persisted, fromVersion) as AppData,
+      // Single canonical schema. There is no production data and no legacy
+      // schema support: a payload from any other version is simply reset.
+      version: SCHEMA_VERSION,
+      migrate: () => createInitialData(),
 
       skipHydration: true,
       partialize: (s) => ({
@@ -142,7 +141,6 @@ export const useAppData = create<AppDataStore>()(
         listings: s.listings,
         transactions: s.transactions,
         activities: s.activities,
-        unminted: s.unminted,
       }),
     },
   ),

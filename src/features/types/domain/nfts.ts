@@ -1,10 +1,6 @@
 import type { HiveNftProperties } from "@/lib/chain/nft-properties";
 import type { GeneratedTrait } from "@/features/lib/traits/types";
-
-export interface NFTAttribute {
-  trait: string;
-  value: string | number;
-}
+import type { NFTAttribute } from "@/features/lib/metadata";
 
 export type NFTStatus = "Owned" | "Listed";
 
@@ -33,7 +29,7 @@ export interface NFT {
    * Chronological mint number of this NFT INSIDE its own collection
    * (1 = first token minted in that collection). Assigned by the mint queue.
    */
-  NftMintedNumber: number | null;
+  NFTMintedNumber: number | null;
   /** Blockchain-shaped custom properties; `metadata` is a JSON STRING. */
   properties: HiveNftProperties;
   /** Mock chain transaction that minted this token. */
