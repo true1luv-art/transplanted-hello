@@ -67,6 +67,7 @@ export function RarityChart({
             configuredProbability: configured ? (probabilities.get(configured.id) ?? 0) : 0,
           };
         })
+        .filter((row) => row.count > 0)
         .sort((a, b) => b.actualFrequency - a.actualFrequency || a.name.localeCompare(b.name));
       return { id: layer?.id ?? layerKey, layerName: layer?.name ?? layerKey, rows };
     });
