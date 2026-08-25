@@ -24,7 +24,7 @@ import {
 } from "@/lib/config/config";
 import { logger } from "@/lib/config/logger";
 import { hiveAvatarUrl, normalizeHiveUsername } from "./identity";
-import { assertCanonicalProperties } from "./nft-properties";
+import { assertCanonicalProperties, assertPropertyLimits, isMetadataUri } from "./nft-properties";
 
 import type {
   BroadcastResult,
