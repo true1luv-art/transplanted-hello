@@ -48,6 +48,21 @@ function NftDetail() {
 
   const history = useMemo(() => activities.filter((a) => a.nftId === id), [activities, id]);
 
+  // Trait rarity for imported/chain-minted tokens comes from observed
+  // frequencies inside the collection, not from creator weights.
+  const probabilities = useMemo(() => {
+    const collectionId = nft?.collectionId;
+    if (!collectionId) return undefined;
+    const population = [
+      ...allNfts.filter((n) => n.collectionId === collectionId),
+      ...nftAssets.filter(
+        (a) => a.collectionId === collectionId && !allNfts.some((n) => n.id === a.id),
+      ),
+    ];
+    return buildTraitProbabilities(population);
+  }, [allNfts, nftAssets, nft?.collectionId]);
+
+
   if (!nft) {
     return (
       <EmptyState
