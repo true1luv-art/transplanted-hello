@@ -66,6 +66,22 @@ function NftDetail() {
     return buildTraitProbabilities(population);
   }, [allNfts, nftAssets, nft?.collectionId]);
 
+  // Theoretical rarity ceiling for the collection, used to display
+  // "score out of max" in the header.
+  const maxScore = useMemo(() => {
+    if (!nft) return 0;
+    if (collection?.traitLayers?.length) {
+      return calculateMaxRarityScore(collection.traitLayers);
+    }
+    const population = [
+      ...allNfts.filter((n) => n.collectionId === nft.collectionId),
+      ...nftAssets.filter(
+        (a) => a.collectionId === nft.collectionId && !allNfts.some((n) => n.id === a.id),
+      ),
+    ];
+    return population.reduce((max, item) => Math.max(max, item.rarityScore ?? 0), 0);
+  }, [collection, nft, allNfts, nftAssets]);
+
 
   if (!nft) {
     return (
