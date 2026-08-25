@@ -17,11 +17,11 @@ import { databaseService, hiveService, marketplaceService, mockHiveService } fro
  * Next CHRONOLOGICAL mint number inside a collection. It counts mints of that
  * collection only — it is not a blockchain token id and not a file number.
  */
-function nextNftMintedNumber(collectionId: string): number {
+function nextNFTMintedNumber(collectionId: string): number {
   const numbers = nftsRepository
     .list()
     .filter((n) => n.collectionId === collectionId)
-    .map((n) => n.NftMintedNumber ?? 0);
+    .map((n) => n.NFTMintedNumber ?? 0);
   return Math.max(0, ...numbers) + 1;
 }
 
@@ -33,7 +33,7 @@ function highestKnownTokenId(): number {
 /**
  * Mint queue. Concurrent mint requests are serialised so two users minting at
  * the same time receive distinct, ordered mint numbers: whoever's transaction
- * is processed first gets the lower `NftMintedNumber`.
+ * is processed first gets the lower `NFTMintedNumber`.
  */
 let mintQueue: Promise<unknown> = Promise.resolve();
 
@@ -48,7 +48,7 @@ function assetToNft(
   asset: NftAsset,
   collection: Collection,
   owner: string,
-  NftMintedNumber: number,
+  NFTMintedNumber: number,
   tokenId: number,
   txId: string,
 ): NFT {
@@ -83,7 +83,7 @@ function assetToNft(
     estimatedValue: collection.mintPrice,
     createdAt: new Date().toISOString(),
     status: "Owned",
-    NftMintedNumber,
+    NFTMintedNumber,
     properties: asset.properties,
     transaction: { txId, type: "NFT_MINT", status: "confirmed" },
   };
@@ -99,7 +99,7 @@ function assetToNft(
 export function drawUnmintedAsset(collectionId: string): NftAsset | undefined {
   const available = nftAssetsRepository
     .listByCollection(collectionId)
-    .filter((asset) => asset.NftMintedNumber === null && asset.status !== "minted");
+    .filter((asset) => asset.NFTMintedNumber === null && asset.status !== "minted");
   if (!available.length) return undefined;
   return available[Math.floor(Math.random() * available.length)];
 }
@@ -127,7 +127,7 @@ async function processMint({ collectionId }: MintNftInput): Promise<MintNftResul
   );
 
   // Mint order inside this collection — assigned once the payment cleared.
-  const NftMintedNumber = nextNftMintedNumber(collectionId);
+  const NFTMintedNumber = nextNFTMintedNumber(collectionId);
   // The chain owns token ids; make sure the mock chain knows what we indexed.
   mockHiveService.syncTokenCounter(highestKnownTokenId());
   const asset = drawUnmintedAsset(collectionId);
@@ -136,11 +136,11 @@ async function processMint({ collectionId }: MintNftInput): Promise<MintNftResul
   if (asset) {
     // The blockchain assigns the token id — we read it back from the issue op.
     const issue = await hiveService.issueNft(collection.symbol, buyer);
-    nft = assetToNft(asset, collection, buyer, NftMintedNumber, issue.tokenId, tx.txId);
+    nft = assetToNft(asset, collection, buyer, NFTMintedNumber, issue.tokenId, tx.txId);
     // The asset row is preserved and marked consumed — never deleted.
     nftAssetsRepository.patch(asset.id, {
       status: "minted",
-      NftMintedNumber,
+      NFTMintedNumber,
       NFTokenID: issue.tokenId,
     });
   } else {
@@ -156,7 +156,7 @@ async function processMint({ collectionId }: MintNftInput): Promise<MintNftResul
         rankTotal: Math.max(1, Math.min(collection.maxSupply, RANK_POOL_CAP)),
         createdAt: new Date().toISOString(),
         seedKey: `${collection.id}-${mintNumber}-${Date.now()}`,
-        NftMintedNumber,
+        NFTMintedNumber,
         tokenId: issue.tokenId,
       }),
       transaction: { txId: tx.txId, type: "NFT_MINT", status: "confirmed" },

@@ -224,7 +224,7 @@ export function toNftView(doc: NftDocument): NFT {
     estimatedValue: doc.estimatedValue,
     createdAt: doc.createdAt,
     status: doc.isListed ? "Listed" : "Owned",
-    NftMintedNumber: doc.NFTokenID ?? null,
+    NFTMintedNumber: doc.NFTokenID ?? null,
     properties: buildNftProperties({
       collection: doc.collectionName,
       symbol: doc.collectionName,

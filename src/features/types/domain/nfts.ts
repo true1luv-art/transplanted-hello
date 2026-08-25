@@ -33,7 +33,7 @@ export interface NFT {
    * Chronological mint number of this NFT INSIDE its own collection
    * (1 = first token minted in that collection). Assigned by the mint queue.
    */
-  NftMintedNumber: number | null;
+  NFTMintedNumber: number | null;
   /** Blockchain-shaped custom properties; `metadata` is a JSON STRING. */
   properties: HiveNftProperties;
   /** Mock chain transaction that minted this token. */

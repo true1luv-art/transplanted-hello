@@ -25,7 +25,7 @@ export interface NftAsset {
    * Chronological mint number inside this collection, assigned by the mint
    * queue. `null` for every asset sitting in unminted inventory.
    */
-  NftMintedNumber: number | null;
+  NFTMintedNumber: number | null;
   /** REAL blockchain token id, read back from Hive at mint time. */
   NFTokenID: number | null;
   /** Blockchain-shaped custom properties; `metadata` is a JSON STRING. */

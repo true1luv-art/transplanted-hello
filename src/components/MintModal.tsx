@@ -94,7 +94,7 @@ export function MintModal({
               <Row label="Token ID" value={minted.nft.tokenId === null ? "Pending" : `#${minted.nft.tokenId}`} />
               <Row
                 label="Mint number"
-                value={minted.nft.NftMintedNumber === null ? "—" : `#${minted.nft.NftMintedNumber}`}
+                value={minted.nft.NFTMintedNumber === null ? "—" : `#${minted.nft.NFTMintedNumber}`}
               />
               <Row label="Collection" value={collection.name} />
               <Row label="Hive transaction" value={minted.txId} mono />

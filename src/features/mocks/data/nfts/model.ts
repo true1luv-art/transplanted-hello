@@ -37,7 +37,7 @@ export function buildNFT(params: {
   rankTotal: number;
   seedKey: string;
   /** Chronological mint number inside the collection. `null` for previews. */
-  NftMintedNumber?: number | null;
+  NFTMintedNumber?: number | null;
   /** REAL blockchain token id read back from the chain. `null` if unminted. */
   tokenId?: number | null;
 }): NFT {
@@ -80,7 +80,7 @@ export function buildNFT(params: {
     estimatedValue: value,
     createdAt,
     status: "Owned",
-    NftMintedNumber: params.NftMintedNumber ?? null,
+    NFTMintedNumber: params.NFTMintedNumber ?? null,
     properties: buildNftProperties({
       collection: collection.name,
       symbol: collection.symbol,

@@ -219,7 +219,7 @@ export function buildNFT(params: {
   rankTotal: number;
   seedKey: string;
   /** Chronological mint number inside the collection. */
-  NftMintedNumber: number;
+  NFTMintedNumber: number;
   /** REAL blockchain token id (global across the platform collection). */
   tokenId: number;
 }): NFT {
@@ -261,7 +261,7 @@ export function buildNFT(params: {
     estimatedValue: value,
     createdAt,
     status: "Owned",
-    NftMintedNumber: params.NftMintedNumber,
+    NFTMintedNumber: params.NFTMintedNumber,
     properties: buildNftProperties({
       collection: collection.name,
       symbol: collection.symbol,
@@ -336,7 +336,7 @@ export function createSeedData(): SeedData {
           rankTotal: poolSize,
           createdAt: ago(Math.floor(rand() * 40 * DAY) + HOUR),
           seedKey: `${collection.id}-seed-${i}`,
-          NftMintedNumber: ++mintedInCollection,
+          NFTMintedNumber: ++mintedInCollection,
           tokenId: ++lastChainTokenId,
         }),
       );
@@ -353,7 +353,7 @@ export function createSeedData(): SeedData {
           token: rarest,
           rankTotal: poolSize,
           createdAt: ago(3 * DAY),
-          NftMintedNumber: ++mintedInCollection,
+          NFTMintedNumber: ++mintedInCollection,
           tokenId: ++lastChainTokenId,
           seedKey: "showcase-1842",
         });

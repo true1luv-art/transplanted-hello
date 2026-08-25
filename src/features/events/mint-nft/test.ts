@@ -41,12 +41,12 @@ describe("mintNft", () => {
       mintNft({ collectionId: collection.id }),
     ]);
 
-    const numbers = [first.nft.NftMintedNumber, second.nft.NftMintedNumber];
+    const numbers = [first.nft.NFTMintedNumber, second.nft.NFTMintedNumber];
     expect(numbers[1]).toBe((numbers[0] ?? 0) + 1);
     // Token ids come from the chain, not from the collection mint order.
     for (const result of [first, second]) {
       expect(result.nft.tokenId).toBeGreaterThan(highestBefore);
-      expect(result.nft.tokenId).not.toBe(result.nft.NftMintedNumber);
+      expect(result.nft.tokenId).not.toBe(result.nft.NFTMintedNumber);
     }
   });
 

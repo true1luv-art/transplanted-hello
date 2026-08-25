@@ -103,7 +103,7 @@ export function BlockchainRows({ nft }: { nft: NFT }) {
       <Row label="Token ID" value={nft.tokenId === null ? "Not minted" : String(nft.tokenId)} mono />
       <Row
         label="Mint number"
-        value={nft.NftMintedNumber === null ? "Not minted" : `#${nft.NftMintedNumber}`}
+        value={nft.NFTMintedNumber === null ? "Not minted" : `#${nft.NFTMintedNumber}`}
       />
       <Row label="File number" value={`#${nft.mintNumber}`} />
       <Row label="Owner" value={`@${nft.owner}`} />

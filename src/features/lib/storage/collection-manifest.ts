@@ -14,22 +14,8 @@ import {
   assertCollectionMetadataDocument,
   type CollectionMetadataDocument,
   type CollectionTraitValue,
-  type NFTMetadataAttribute,
   type NFTMetadataDocument,
 } from "@/features/lib/generator/metadata";
-
-export type {
-  CollectionMetadataDocument,
-  CollectionTraitValue,
-  NFTMetadataDocument,
-} from "@/features/lib/generator/metadata";
-
-export interface ManifestNftInput {
-  name: string;
-  description: string;
-  image: string;
-  attributes: NFTMetadataAttribute[];
-}
 
 export interface BuildManifestInput {
   name: string;
@@ -38,7 +24,7 @@ export interface BuildManifestInput {
   height: number;
   /** Complete configured trait system. Derived from the NFTs when absent. */
   traits?: Record<string, CollectionTraitValue[]> | undefined;
-  nfts: ManifestNftInput[];
+  nfts: NFTMetadataDocument[];
 }
 
 const DEFAULT_WEIGHT = 50;
@@ -48,7 +34,7 @@ const DEFAULT_WEIGHT = 50;
  * trait definitions: every observed value with its occurrence count as weight.
  */
 export function traitsFromNfts(
-  nfts: ManifestNftInput[],
+  nfts: NFTMetadataDocument[],
 ): Record<string, CollectionTraitValue[]> {
   const traits: Record<string, Map<string, number>> = {};
   for (const nft of nfts) {
@@ -124,7 +110,7 @@ export function buildCollectionManifest(
  */
 export function appendNftsToManifest(
   current: CollectionMetadataDocument,
-  added: ManifestNftInput[],
+  added: NFTMetadataDocument[],
 ): CollectionMetadataDocument {
   const existing = new Set(current.nfts.map((nft) => nft.name));
   const merged = [...current.nfts];
