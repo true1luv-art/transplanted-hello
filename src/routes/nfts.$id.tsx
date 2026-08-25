@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeftRight, BadgeCheck, Crown, Loader2, Tag } from "lucide-react";
+import { ArrowLeftRight, BadgeCheck, Loader2, Tag, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 import { ActivityFeed } from "@/components/ActivityFeed";
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { hive } from "@/lib/format";
 import { useAppStore } from "@/features/stores/app-store";
 import { buildTraitProbabilities } from "@/features/lib/traits/collection-frequency";
+import { calculateMaxRarityScore } from "@/features/lib/traits/rarity";
 
 export const Route = createFileRoute("/nfts/$id")({
   head: () => ({
