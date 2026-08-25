@@ -838,7 +838,15 @@ export async function issueNftAsIssuer(
     throw new HiveChainError("NOT_CONFIGURED", "ISSUER_KEYS is not a valid Hive private key");
   }
 
-  logger.info("BLOCKCHAIN:HIVE", "Issuing NFT", { symbol, collection, to, issuer });
+  // Never log ISSUER_KEYS or the signing key — only non-secret identifiers.
+  logger.info("BLOCKCHAIN:HIVE", "Issuing NFT", {
+    platformSymbol,
+    collection,
+    collectionSymbol,
+    metadataUri,
+    to,
+    issuer,
+  });
   const result = await rpc("broadcast.sendOperations(nft.issue)", () =>
     getHiveClient().broadcast.sendOperations(issuance.operations as never, signingKey),
   );
@@ -846,8 +854,8 @@ export async function issueNftAsIssuer(
 
   const outcome = await waitForNftIssuance(
     txId,
-    { symbol, to },
+    { symbol: platformSymbol, to },
     params.confirmTimeoutMs ? { timeoutMs: params.confirmTimeoutMs } : undefined,
   );
-  return { ...outcome, transactionId: txId, issuer, collection };
+  return { ...outcome, transactionId: txId, issuer, collection, collectionSymbol, metadataUri };
 }
