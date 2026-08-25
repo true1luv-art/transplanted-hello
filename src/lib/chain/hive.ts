@@ -763,10 +763,12 @@ export function getIssuerAccount(): string {
 }
 
 export interface IssuerNftIssuanceParams {
-  /** Application (virtual) collection name written to the `collection` property. */
+  /** Creator collection name written to the `collection` property. */
   collection: string;
-  /** Serialized IPFS metadata document. Must already be a JSON string. */
-  metadata: string;
+  /** CREATOR collection symbol written to `properties.symbol` (e.g. "OO"). */
+  collectionSymbol: string;
+  /** IPFS URI of the metadata JSON — never the metadata document itself. */
+  metadataUri: string;
   /** Hive account that receives the token. */
   to: string;
   /** Optional override of the polling window for the token id. */
@@ -776,8 +778,12 @@ export interface IssuerNftIssuanceParams {
 export interface IssuerNftIssuanceResult extends NftIssuanceOutcome {
   /** Hive account that signed the issuance. */
   issuer: string;
-  /** Application collection carried in the token properties. */
+  /** Creator collection carried in the token properties. */
   collection: string;
+  /** Creator collection symbol carried in `properties.symbol`. */
+  collectionSymbol: string;
+  /** IPFS metadata URI written to `properties.metadata`. */
+  metadataUri: string;
 }
 
 /**
