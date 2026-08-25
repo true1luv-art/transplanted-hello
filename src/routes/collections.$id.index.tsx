@@ -84,7 +84,9 @@ function CollectionDetail() {
 
     void Promise.allSettled(
       allItems.map((nft) => {
-        const metadataUri = nft.properties?.metadata || nft.metadataUri;
+        // `metadataUri` is the canonical IPFS reference. Legacy local records
+        // may still carry serialized JSON in `properties.metadata`.
+        const metadataUri = nft.metadataUri || nft.properties?.metadata;
         if (!metadataUri) return Promise.reject(new Error("Minted NFT has no metadata URI"));
         return loadIpfsNftAttributes(metadataUri, controller.signal);
       }),
