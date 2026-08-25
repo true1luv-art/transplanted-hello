@@ -228,12 +228,7 @@ export function toNftView(doc: NftDocument): NFT {
     properties: buildNftProperties({
       collection: doc.collectionName,
       symbol: doc.collectionName,
-      metadata: {
-        name: doc.name,
-        description: doc.description,
-        image: doc.image,
-        attributes: doc.attributes,
-      },
+      metadataUri: doc.metadataUri,
     }),
   };
 }

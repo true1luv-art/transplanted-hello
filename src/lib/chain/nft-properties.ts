@@ -5,16 +5,28 @@
  * (`collection_name`, `collection_symbol`, `nft_metadata`). The blockchain
  * facing schema is exactly three String properties:
  *
- *   collection  -> collection identifier / name
- *   symbol      -> collection symbol
- *   metadata    -> NFT metadata reference (IPFS URI / CID)
+ *   collection  -> CREATOR collection name           (e.g. "Otters Outbreak")
+ *   symbol      -> CREATOR collection symbol         (e.g. "OO")
+ *   metadata    -> IPFS URI of the metadata document (e.g. "ipfs://Qm…/1.json")
  *
  * These are the only names the app may create, write, or read.
+ *
+ * IMPORTANT — two different symbols exist in this system:
+ *   - PLATFORM_NFT_SYMBOL (e.g. TESTNFTS) is the Hive Engine NFT contract the
+ *     platform issues into. It belongs in `contractPayload.symbol` ONLY.
+ *   - The creator collection symbol (e.g. OO) belongs in `properties.symbol`.
+ * They must never be swapped.
+ *
+ * Hive Engine limits every string property to 100 characters, so the FULL
+ * metadata document is never written on chain — only its IPFS URI.
  */
 
 export const HIVE_NFT_PROPERTY_NAMES = ["collection", "symbol", "metadata"] as const;
 
 export type HiveNftPropertyName = (typeof HIVE_NFT_PROPERTY_NAMES)[number];
+
+/** Hive Engine hard limit for a String NFT property value. */
+export const HIVE_NFT_PROPERTY_MAX_LENGTH = 100;
 
 export interface HiveNftPropertyDefinition {
   name: HiveNftPropertyName;
@@ -27,24 +39,35 @@ export const HIVE_NFT_PROPERTY_DEFINITIONS: HiveNftPropertyDefinition[] =
   HIVE_NFT_PROPERTY_NAMES.map((name) => ({ name, type: "string", isReadOnly: false }));
 
 export interface HiveNftProperties {
+  /** Creator collection name. */
   collection: string;
+  /** Creator collection symbol — NEVER the platform NFT symbol. */
   symbol: string;
+  /** IPFS URI of the metadata JSON — NEVER the serialized metadata itself. */
   metadata: string;
 }
 
-/** Builds the compact per-token property values written on chain. */
-export function buildHiveNftProperties(input: {
+export interface BuildHiveNftPropertiesInput {
   collection: string;
   symbol: string;
   /** IPFS URI / CID of the token metadata document — never the full object. */
   metadataUri: string;
-}): HiveNftProperties {
+}
+
+/** Builds the compact per-token property values written on chain. */
+export function buildHiveNftProperties(input: BuildHiveNftPropertiesInput): HiveNftProperties {
   return {
     collection: input.collection,
     symbol: input.symbol.toUpperCase(),
     metadata: input.metadataUri,
   };
 }
+
+/**
+ * Alias kept for the application/local-database side, which stores exactly the
+ * same blockchain-shaped object.
+ */
+export const buildNftProperties = buildHiveNftProperties;
 
 export function isHiveNftPropertyName(value: string): value is HiveNftPropertyName {
   return (HIVE_NFT_PROPERTY_NAMES as readonly string[]).includes(value);
@@ -61,35 +84,33 @@ export function assertCanonicalProperties(properties: Record<string, unknown>): 
 }
 
 /**
- * Builds the per-token properties stored in the mock database.
- *
- * The chain requires every property value to be a STRING, so the NFT metadata
- * document is serialised here and parsed back with `parseNftMetadata` whenever
- * the application needs to work with it as an object.
+ * Enforces the Hive Engine 100-character String property limit and rejects a
+ * `metadata` value that is a serialized document instead of an IPFS URI.
+ * Throws with a readable message so the UI can surface it before broadcasting.
  */
-export function buildNftProperties(input: {
-  collection: string;
-  symbol: string;
-  /** Metadata document (serialised here) or an already-serialised string. */
-  metadata: unknown;
-}): HiveNftProperties {
-  return {
-    collection: input.collection,
-    symbol: input.symbol.toUpperCase(),
-    metadata:
-      typeof input.metadata === "string" ? input.metadata : JSON.stringify(input.metadata ?? {}),
-  };
+export function assertPropertyLimits(properties: HiveNftProperties): void {
+  for (const name of HIVE_NFT_PROPERTY_NAMES) {
+    const value = properties[name];
+    if (typeof value !== "string" || value.trim() === "") {
+      throw new Error(`Hive NFT property "${name}" is empty`);
+    }
+    if (value.length > HIVE_NFT_PROPERTY_MAX_LENGTH) {
+      throw new Error(
+        `Hive NFT property "${name}" is ${value.length} characters — the Hive Engine limit is ${HIVE_NFT_PROPERTY_MAX_LENGTH}`,
+      );
+    }
+  }
+  const metadata = properties.metadata.trim();
+  if (metadata.startsWith("{") || metadata.startsWith("[")) {
+    throw new Error(
+      "Hive NFT property \"metadata\" must be the IPFS URI of the metadata JSON, not the metadata itself",
+    );
+  }
 }
 
-/** Parses `properties.metadata` back into an object. Never throws. */
-export function parseNftMetadata(
-  properties: Pick<HiveNftProperties, "metadata"> | null | undefined,
-): Record<string, unknown> {
-  if (!properties?.metadata) return {};
-  try {
-    const parsed: unknown = JSON.parse(properties.metadata);
-    return parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
-  } catch {
-    return {};
-  }
+/** true when the value looks like an IPFS reference the chain can carry. */
+export function isMetadataUri(value: string): boolean {
+  const uri = value.trim();
+  if (!uri || uri.length > HIVE_NFT_PROPERTY_MAX_LENGTH) return false;
+  return /^ipfs:\/\/.+/i.test(uri) || /^https?:\/\/.+/i.test(uri) || /^(Qm|bafy)\w+/.test(uri);
 }

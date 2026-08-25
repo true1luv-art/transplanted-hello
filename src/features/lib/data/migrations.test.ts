@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { DB_VERSION, migrateAppData, migrateV1ToV2 } from "@/features/lib/data/migrations";
-import { parseNftMetadata } from "@/lib/chain/nft-properties";
 
 const v1State = () => ({
   collections: [{ id: "col-1", name: "Otters", symbol: "OTTERS" }],
@@ -75,7 +74,7 @@ describe("mock database migrations", () => {
     expect(Object.keys(props).sort()).toEqual(["collection", "metadata", "symbol"]);
     expect(typeof props.metadata).toBe("string");
     expect(props.symbol).toBe("OTTERS");
-    expect(parseNftMetadata(props)["name"]).toBe("otters #1");
+    expect(props.metadata).toBe("ipfs://meta/1.json");
   });
 
   it("preserves unrelated data", () => {

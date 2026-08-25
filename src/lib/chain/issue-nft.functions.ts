@@ -11,10 +11,15 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const issueInput = z.object({
-  /** Application (virtual) collection name, e.g. "Otters Outbreak". */
-  collection: z.string().min(1),
-  /** Serialized IPFS metadata document (already a JSON string). */
-  metadata: z.string().min(2),
+  /** Creator collection name, e.g. "Otters Outbreak". */
+  collection: z.string().min(1).max(100),
+  /** Creator collection symbol, e.g. "OO" — never the platform NFT symbol. */
+  collectionSymbol: z.string().min(1).max(100),
+  /** IPFS URI of the metadata JSON, e.g. "ipfs://Qm…/otters-1.json". */
+  metadataUri: z
+    .string()
+    .min(5)
+    .max(100, "The IPFS metadata URI exceeds the Hive Engine 100-character property limit"),
   /** Hive account receiving the token. */
   to: z.string().min(3),
 });
@@ -23,9 +28,13 @@ export interface IssueNftOnHiveResult {
   txId: string;
   /** REAL Hive token id — null when the sidechain has not indexed it yet. */
   tokenId: number | null;
-  /** Platform Hive NFT symbol the token was issued into. */
+  /** PLATFORM Hive NFT contract symbol the token was issued into. */
   symbol: string;
   collection: string;
+  /** Creator collection symbol written to `properties.symbol`. */
+  collectionSymbol: string;
+  /** IPFS metadata URI written to `properties.metadata`. */
+  metadataUri: string;
   issuer: string;
   to: string;
   error?: string | undefined;
@@ -38,7 +47,8 @@ export const issueNftOnHive = createServerFn({ method: "POST" })
     const { issueNftAsIssuer } = await import("./hive");
     const outcome = await issueNftAsIssuer({
       collection: data.collection,
-      metadata: data.metadata,
+      collectionSymbol: data.collectionSymbol,
+      metadataUri: data.metadataUri,
       to: data.to,
     });
     return {
@@ -46,6 +56,8 @@ export const issueNftOnHive = createServerFn({ method: "POST" })
       tokenId: outcome.tokenId,
       symbol: outcome.symbol,
       collection: outcome.collection,
+      collectionSymbol: outcome.collectionSymbol,
+      metadataUri: outcome.metadataUri,
       issuer: outcome.issuer,
       to: outcome.to,
       error: outcome.error,

@@ -6,7 +6,7 @@ import { buildNftProperties } from "./nft-properties";
 const properties = buildNftProperties({
   collection: "Otters Outbreak",
   symbol: "oo",
-  metadata: { name: "OTTERS #1", description: "yes", image: "ipfs://cid", attributes: [] },
+  metadataUri: "ipfs://cid/otters-1.json",
 });
 
 describe("prepareNftIssuance", () => {
@@ -32,13 +32,14 @@ describe("prepareNftIssuance", () => {
     expect(call.contractPayload["to"]).toBe("rhiaji");
   });
 
-  it("writes only the canonical properties, with metadata as a JSON string", () => {
+  it("writes only the canonical properties, with metadata as the IPFS URI", () => {
     const call = buildNftIssueCall({ account: "rhiaji", symbol: "OO", properties });
     const props = call.contractPayload["properties"] as Record<string, unknown>;
 
     expect(Object.keys(props).sort()).toEqual(["collection", "metadata", "symbol"]);
     expect(typeof props["metadata"]).toBe("string");
-    expect(JSON.parse(String(props["metadata"]))["name"]).toBe("OTTERS #1");
+    expect(props["metadata"]).toBe("ipfs://cid/otters-1.json");
+    expect(props["symbol"]).toBe("OO");
   });
 
   it("never invents a token id and refuses incomplete input", () => {

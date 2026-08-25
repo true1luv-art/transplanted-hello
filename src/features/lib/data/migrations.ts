@@ -36,25 +36,22 @@ const symbolFor = (collections: Collection[], collectionId: string, fallback: st
 const nameFor = (collections: Collection[], collectionId: string, fallback: string): string =>
   collections.find((c) => c.id === collectionId)?.name ?? fallback ?? "";
 
-/** Rebuilds blockchain-shaped properties from whatever the record carries. */
+/**
+ * Rebuilds blockchain-shaped properties from whatever the record carries.
+ * Legacy rows stored the whole serialized metadata document in
+ * `properties.metadata`; those are rebuilt around the IPFS metadata URI.
+ */
 function propertiesFor(record: Loose, collectionName: string, symbol: string): HiveNftProperties {
   const existing = record["properties"] as Loose | undefined;
-  if (
-    existing &&
-    typeof existing["symbol"] === "string" &&
-    typeof existing["metadata"] === "string"
-  ) {
+  const existingMetadata = typeof existing?.["metadata"] === "string" ? existing["metadata"] : "";
+  const isSerializedDocument = existingMetadata.trim().startsWith("{");
+  if (existing && typeof existing["symbol"] === "string" && existingMetadata && !isSerializedDocument) {
     return existing as unknown as HiveNftProperties;
   }
   return buildNftProperties({
     collection: collectionName,
     symbol,
-    metadata: {
-      name: String(record["name"] ?? ""),
-      description: String(record["description"] ?? ""),
-      image: String(record["imageUri"] ?? record["image"] ?? ""),
-      attributes: asArray(record["attributes"]),
-    },
+    metadataUri: String(record["metadataUri"] ?? ""),
   });
 }
 

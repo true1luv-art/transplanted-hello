@@ -212,19 +212,21 @@ export interface HiveAccountProfile {
 
 /** Canonical, chain-facing NFT properties. Every value is a STRING. */
 export interface HiveNftIssueProperties {
+  /** Creator collection name, e.g. "Otters Outbreak". */
   collection: string;
+  /** CREATOR collection symbol, e.g. "OO" — never the platform NFT symbol. */
   symbol: string;
-  /** Serialized IPFS metadata document (JSON string). */
+  /** IPFS URI of the metadata JSON, e.g. "ipfs://Qm…/otters-1.json". */
   metadata: string;
 }
 
 /** Everything the chain layer needs to build an NFT issuance operation. */
 export interface NftIssuanceParams {
-  /** Hive account that signs and pays — always the connected user. */
+  /** Hive account that signs and pays. */
   account: string;
   /** Recipient of the token; defaults to `account`. */
   to?: string;
-  /** Collection symbol registered on the NFT contract. */
+  /** PLATFORM Hive Engine NFT contract symbol (contractPayload.symbol). */
   symbol: string;
   properties: HiveNftIssueProperties;
 }

@@ -37,15 +37,12 @@ export function buildNftAsset(input: CreateNftAssetInput): NftAsset {
     // Hive assigns this at mint time; a prepared asset is always unminted.
     NFTokenID: null,
     NftMintedNumber: null,
+    // Chain-shaped properties: the creator collection symbol plus the IPFS URI
+    // of the metadata document (never the metadata itself).
     properties: buildNftProperties({
       collection: input.collectionName ?? input.collectionId,
       symbol: input.symbol ?? "",
-      metadata: {
-        name: input.name,
-        description: input.description,
-        image: input.imageUri ?? "",
-        attributes: input.attributes,
-      },
+      metadataUri: input.metadataUri ?? "",
     }),
     name: input.name,
     description: input.description,

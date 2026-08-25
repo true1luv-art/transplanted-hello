@@ -201,8 +201,9 @@ function commitMint(params: {
     params.properties ??
     buildNftProperties({
       collection: collection.name,
-      symbol: record.symbol || collection.symbol,
-      metadata,
+      // Creator collection symbol — the platform symbol never lands here.
+      symbol: collection.symbol || record.symbol,
+      metadataUri: asset.metadataUri ?? "",
     });
   const nft = toMintedNft({
     asset,
@@ -322,8 +323,9 @@ export async function mintNftAsset(input: MintNftAssetInput): Promise<MintNftAss
       // RPC unreachable for the balance check must not block the signature.
     }
 
-    // 3. Chain-facing metadata: a STRING, exactly as stored on IPFS.
-    const metadataString = JSON.stringify(metadata);
+    // 3. Chain-facing metadata: the IPFS URI ONLY. Hive Engine caps every NFT
+    //    property at 100 characters, so the document itself never goes on chain.
+    const metadataUri = asset.metadataUri;
 
     // 4. The ISSUER account signs and broadcasts the real Hive transaction.
     //    The private key stays on the server — the browser only sends data.
@@ -332,7 +334,13 @@ export async function mintNftAsset(input: MintNftAssetInput): Promise<MintNftAss
     let issued: Awaited<ReturnType<typeof issueNftOnHive>>;
     try {
       issued = await issueNftOnHive({
-        data: { collection: collection.name, metadata: metadataString, to: account },
+        data: {
+          collection: collection.name,
+          // The CREATOR collection symbol (e.g. "OO"), not the platform symbol.
+          collectionSymbol: symbol,
+          metadataUri,
+          to: account,
+        },
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Hive issuance failed";
@@ -344,12 +352,12 @@ export async function mintNftAsset(input: MintNftAssetInput): Promise<MintNftAss
     if (issued.error) throw fail("CHAIN_ERROR", issued.error);
 
     const txId = issued.txId;
-    // The chain symbol is the ONE platform collection (e.g. TESTNFTS); the
-    // application collection lives in the `collection` property.
+    // `issued.symbol` is the PLATFORM Hive Engine NFT symbol (e.g. TESTNFTS).
+    // `properties.symbol` carries the CREATOR collection symbol instead.
     const properties = buildNftProperties({
       collection: collection.name,
-      symbol: issued.symbol,
-      metadata,
+      symbol: issued.collectionSymbol,
+      metadataUri: issued.metadataUri,
     });
     mintTransactionsRepository.patch(record.id, {
       status: "broadcasted",
