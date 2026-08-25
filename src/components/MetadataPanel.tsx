@@ -1,48 +1,81 @@
 import { hive, num, shortDate } from "@/lib/format";
 import { traitRarityContribution } from "@/features/lib/traits";
+import { traitProbabilityKey } from "@/features/lib/traits/collection-frequency";
 import type { NFT } from "@/features/types/domain/nfts";
 
 /** Trait cards for the "Attributes" tab. */
-export function AttributesGrid({ nft }: { nft: NFT }) {
+export function AttributesGrid({
+  nft,
+  probabilities,
+}: {
+  nft: NFT;
+  /** Observed trait probabilities across the collection (`trait\0value`). */
+  probabilities?: Map<string, number> | undefined;
+}) {
+  const probabilityFor = (trait: string, value: string | number, fallback = 0) =>
+    probabilities?.get(traitProbabilityKey(trait, value)) ?? fallback;
+
   if (nft.traits?.length) {
     return (
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {nft.traits.map((trait) => (
-          <li
-            key={trait.layerId}
-            className="rounded-lg border border-border bg-surface px-3 py-2.5"
-          >
-            <p className="text-[11px] tracking-wider text-muted-foreground uppercase">
-              {trait.layerName}
-            </p>
-            <p className="mt-0.5 truncate font-display text-sm font-semibold">
-              {trait.traitValueName}
-            </p>
-            <div className="mt-2 flex items-center justify-between gap-2">
-              <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-primary">
-                {(trait.probability * 100).toFixed(1)}%
-              </span>
-              <span className="text-[11px] tabular-nums text-muted-foreground">
-                +{traitRarityContribution(trait).toFixed(2)} score
-              </span>
-            </div>
-          </li>
-        ))}
+        {nft.traits.map((trait) => {
+          const probability = probabilityFor(
+            trait.layerName,
+            trait.traitValueName,
+            trait.probability,
+          );
+          const score = traitRarityContribution({ ...trait, probability });
+          return (
+            <li
+              key={trait.layerId}
+              className="rounded-lg border border-border bg-surface px-3 py-2.5"
+            >
+              <p className="text-[11px] tracking-wider text-muted-foreground uppercase">
+                {trait.layerName}
+              </p>
+              <p className="mt-0.5 truncate font-display text-sm font-semibold">
+                {trait.traitValueName}
+              </p>
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-primary">
+                  {(probability * 100).toFixed(1)}%
+                </span>
+                <span className="text-[11px] tabular-nums text-muted-foreground">
+                  +{score.toFixed(2)} score
+                </span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     );
   }
 
   return (
     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-      {nft.attributes.map((a) => (
-        <li key={a.trait} className="rounded-lg border border-border bg-surface px-3 py-2.5">
-          <p className="text-[11px] tracking-wider text-muted-foreground uppercase">{a.trait}</p>
-          <p className="mt-0.5 font-display text-sm font-semibold">{String(a.value)}</p>
-        </li>
-      ))}
+      {nft.attributes.map((a) => {
+        const probability = probabilityFor(a.trait, a.value);
+        return (
+          <li key={a.trait} className="rounded-lg border border-border bg-surface px-3 py-2.5">
+            <p className="text-[11px] tracking-wider text-muted-foreground uppercase">{a.trait}</p>
+            <p className="mt-0.5 font-display text-sm font-semibold">{String(a.value)}</p>
+            {probability > 0 && (
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-primary">
+                  {(probability * 100).toFixed(1)}%
+                </span>
+                <span className="text-[11px] tabular-nums text-muted-foreground">
+                  +{(1 / probability).toFixed(2)} score
+                </span>
+              </div>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }
+
 
 /** Token metadata rows for the "Metadata" tab. */
 export function MetadataRows({ nft }: { nft: NFT }) {
