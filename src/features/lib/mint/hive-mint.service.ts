@@ -201,8 +201,9 @@ function commitMint(params: {
     params.properties ??
     buildNftProperties({
       collection: collection.name,
-      symbol: record.symbol || collection.symbol,
-      metadata,
+      // Creator collection symbol — the platform symbol never lands here.
+      symbol: collection.symbol || record.symbol,
+      metadataUri: asset.metadataUri ?? "",
     });
   const nft = toMintedNft({
     asset,
