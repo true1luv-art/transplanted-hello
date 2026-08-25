@@ -26,7 +26,7 @@ export async function exportNfts(ctx: GeneratorContext): Promise<void> {
   await yieldToBrowser();
 
   try {
-    const collection = buildCollectionArchive(settings, layers);
+    const collection = buildCollectionArchive(settings, layers, result.nfts);
     report(1, `Packaging batch 1 of ${batchPlan.length}`);
     await yieldToBrowser();
 

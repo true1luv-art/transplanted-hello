@@ -24,13 +24,16 @@ const zip = (tree: Zippable): Uint8Array => zipSync(tree, { level: 6 });
 
 export const COLLECTION_ARCHIVE_NAME = "metadata.zip";
 
-/** metadata.zip — collection-level document only. */
+/** metadata.zip — the complete collection manifest (traits + every NFT). */
 export function buildCollectionArchive(
   settings: GeneratorSettings,
   layers: GeneratorLayer[],
+  nfts: GeneratedNFT[],
 ): ExportFile {
   const bytes = zip({
-    metadata: { "metadata.json": toJsonBytes(collectionMetadataDocument(settings, layers)) },
+    metadata: {
+      "metadata.json": toJsonBytes(collectionMetadataDocument(settings, layers, nfts)),
+    },
   });
   return { filename: COLLECTION_ARCHIVE_NAME, bytes, count: 0, kind: "collection" };
 }
@@ -98,7 +101,7 @@ export function buildExportPackage(options: {
 }): ExportPackage {
   const { settings, nfts, images, layers } = options;
   const batchPlan = splitBatches(nfts, settings, options.batchSize ?? BATCH_SIZE);
-  const collection = buildCollectionArchive(settings, layers);
+  const collection = buildCollectionArchive(settings, layers, nfts);
   const batches = batchPlan.map((batch) => buildBatchArchive(batch, nfts, images));
 
   const tree: Zippable = { [collection.filename]: collection.bytes };
