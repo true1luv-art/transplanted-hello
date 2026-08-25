@@ -351,12 +351,12 @@ export async function mintNftAsset(input: MintNftAssetInput): Promise<MintNftAss
     if (issued.error) throw fail("CHAIN_ERROR", issued.error);
 
     const txId = issued.txId;
-    // The chain symbol is the ONE platform collection (e.g. TESTNFTS); the
-    // application collection lives in the `collection` property.
+    // `issued.symbol` is the PLATFORM Hive Engine NFT symbol (e.g. TESTNFTS).
+    // `properties.symbol` carries the CREATOR collection symbol instead.
     const properties = buildNftProperties({
       collection: collection.name,
-      symbol: issued.symbol,
-      metadata,
+      symbol: issued.collectionSymbol,
+      metadataUri: issued.metadataUri,
     });
     mintTransactionsRepository.patch(record.id, {
       status: "broadcasted",
