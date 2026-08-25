@@ -26,7 +26,6 @@ export interface CreateCollectionInput {
    * Imported, already-authored NFTs. Stored as an UNMINTED pool — minting
    * hands one over, it never generates a token.
    */
-  importedNfts?: NFT[];
 }
 
 export type CreateCollectionResult = Collection;

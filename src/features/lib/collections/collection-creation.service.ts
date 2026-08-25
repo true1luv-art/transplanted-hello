@@ -50,7 +50,6 @@ export interface ImportedNftRecord {
   rarityScore: number;
   rarityRank: number;
   /** untouched source metadata document */
-  sourceMetadata: Record<string, unknown>;
 }
 
 export interface CollectionAssetBundle {
@@ -192,7 +191,6 @@ export async function prepareCollection(
               rarityScore: imported.rarityScore,
               rarityRank: imported.rarityRank,
               rarityRankTotal: importedTotal,
-              sourceMetadata: imported.sourceMetadata,
               imported: true,
             }
           : {}),

@@ -17,7 +17,6 @@ export interface CreateNftAssetInput {
   metadataRootCid?: string | undefined;
   imageUri?: string | undefined;
   metadataUri?: string | undefined;
-  dna?: string | undefined;
   rarityScore?: number | undefined;
   rarityRank?: number | undefined;
   rarityRankTotal?: number | undefined;
@@ -55,9 +54,7 @@ export function buildNftAsset(input: CreateNftAssetInput): NftAsset {
     metadataRootCid: input.metadataRootCid,
     imageUri: input.imageUri,
     metadataUri: input.metadataUri,
-    cid: input.imageCid,
     attributes: input.attributes,
-    dna: input.dna,
     rarityScore: input.rarityScore,
     rarityRank: input.rarityRank,
     rarityRankTotal: input.rarityRankTotal,

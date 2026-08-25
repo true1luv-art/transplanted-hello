@@ -42,8 +42,6 @@ export interface AppData {
   /** Journal of REAL Hive mint attempts (pending -> confirmed/failed). */
   mintTransactions: MintTransactionRecord[];
   activities: Activity[];
-  /** Unminted imported NFTs, keyed by collection id. */
-  unminted: Record<string, NFT[]>;
   connecting: boolean;
 }
 
@@ -78,7 +76,6 @@ export function createInitialData(): AppData {
     transactions: [],
     mintTransactions: [],
     activities: [],
-    unminted: {},
     connecting: false,
   };
 }
@@ -144,7 +141,6 @@ export const useAppData = create<AppDataStore>()(
         listings: s.listings,
         transactions: s.transactions,
         activities: s.activities,
-        unminted: s.unminted,
       }),
     },
   ),

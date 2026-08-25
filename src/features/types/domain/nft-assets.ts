@@ -47,13 +47,10 @@ export interface NftAsset {
   imageUri?: string | undefined;
   /** `ipfs://CID` of the metadata JSON, once uploaded. */
   metadataUri?: string | undefined;
-  /** Legacy alias for `imageCid`. */
-  cid?: string | undefined;
   attributes: NFTAttribute[];
   rarityScore?: number | undefined;
   rarityRank?: number | undefined;
   rarityRankTotal?: number | undefined;
-  dna?: string | undefined;
   status: NftAssetStatus;
   error?: string | undefined;
   createdAt: string;

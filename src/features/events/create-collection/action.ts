@@ -9,7 +9,7 @@ import { databaseService, hiveService } from "@/features/mocks/services";
 
 /**
  * Deploys a new collection: charges the deployment fee, records the chain
- * transaction and stores the collection (plus any imported unminted tokens).
+ * transaction and stores the collection.
  */
 export async function createCollection(
   input: CreateCollectionInput,
@@ -32,12 +32,6 @@ export async function createCollection(
   await databaseService.saveCollection(collection);
 
   collectionsRepository.insert(collection);
-  if (input.importedNfts?.length) {
-    collectionsRepository.setUnminted(
-      collectionId,
-      input.importedNfts.map((nft) => ({ ...nft, collectionId })),
-    );
-  }
 
   usersRepository.adjustBalance(creator, -fee);
   activityRepository.addTransaction({
