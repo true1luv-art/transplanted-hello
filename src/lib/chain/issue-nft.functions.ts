@@ -47,7 +47,8 @@ export const issueNftOnHive = createServerFn({ method: "POST" })
     const { issueNftAsIssuer } = await import("./hive");
     const outcome = await issueNftAsIssuer({
       collection: data.collection,
-      metadata: data.metadata,
+      collectionSymbol: data.collectionSymbol,
+      metadataUri: data.metadataUri,
       to: data.to,
     });
     return {
@@ -55,6 +56,8 @@ export const issueNftOnHive = createServerFn({ method: "POST" })
       tokenId: outcome.tokenId,
       symbol: outcome.symbol,
       collection: outcome.collection,
+      collectionSymbol: outcome.collectionSymbol,
+      metadataUri: outcome.metadataUri,
       issuer: outcome.issuer,
       to: outcome.to,
       error: outcome.error,
