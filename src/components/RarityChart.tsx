@@ -71,6 +71,7 @@ export function RarityChart({
         .sort((a, b) => b.actualFrequency - a.actualFrequency || a.name.localeCompare(b.name));
       return { id: layer?.id ?? layerKey, layerName: layer?.name ?? layerKey, rows };
     });
+    return built.filter((group) => group.rows.length > 0);
   }, [layers, mintedAttributes]);
 
   if (loading) {
