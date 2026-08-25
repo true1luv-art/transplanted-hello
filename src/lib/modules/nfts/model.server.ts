@@ -227,13 +227,8 @@ export function toNftView(doc: NftDocument): NFT {
     NftMintedNumber: doc.NFTokenID ?? null,
     properties: buildNftProperties({
       collection: doc.collectionName,
-      symbol: doc.collectionName,
-      metadata: {
-        name: doc.name,
-        description: doc.description,
-        image: doc.image,
-        attributes: doc.attributes,
-      },
+      symbol: doc.collectionSymbol ?? doc.collectionName,
+      metadataUri: doc.metadataUri,
     }),
   };
 }
