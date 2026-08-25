@@ -8,8 +8,8 @@
  * Nothing here generates NFTs — the records already exist.
  */
 import { getStorageProvider } from "@/features/lib/storage/storage";
-import { buildCollectionManifest } from "@/features/lib/storage/collection-manifest";
-import type { CollectionTraitValue } from "@/features/lib/generator/metadata";
+import { buildCollectionMetadata } from "@/features/lib/metadata";
+import type { TraitDefinition } from "@/features/lib/metadata";
 import { mimeFromFilename } from "@/features/lib/storage/validation";
 import {
   batchImagesNamespace,
@@ -172,7 +172,7 @@ export interface UploadImportInput {
   width?: number | undefined;
   height?: number | undefined;
   /** Complete configured trait system from the imported manifest. */
-  traits?: Record<string, CollectionTraitValue[]> | undefined;
+  traits?: Record<string, TraitDefinition[]> | undefined;
 }
 
 /** Used when the imported manifest carried no canvas size. */
@@ -299,7 +299,7 @@ export async function uploadImportedCollection(
   // references inside `nfts[]`, and no launch/application state.
   const collectionMetadata = await storage.uploadJson(
     collectionMetadataFilename(input.creator, input.symbol),
-    buildCollectionManifest({
+    buildCollectionMetadata({
       name: input.name,
       description: input.description,
       width: input.width ?? DEFAULT_CANVAS,

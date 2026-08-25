@@ -1,6 +1,6 @@
 import type { UploadState } from "@/features/lib/import/pipeline";
 import type { ImportReport } from "@/features/lib/import/types";
-import type { CollectionTraitValue } from "@/features/lib/generator/metadata";
+import type { TraitDefinition } from "@/features/lib/metadata";
 import type { Collection } from "@/features/types/domain/collections";
 
 /** Application-level contract for the "import collection" use case. */
@@ -27,7 +27,7 @@ export interface ImportCollectionInput {
     | {
         width?: number | undefined;
         height?: number | undefined;
-        traits?: Record<string, CollectionTraitValue[]> | undefined;
+        traits?: Record<string, TraitDefinition[]> | undefined;
       }
     | undefined;
   /** Creator's available HIVE balance, checked before any upload happens. */

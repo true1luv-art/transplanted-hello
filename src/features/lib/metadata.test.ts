@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  appendNftsToManifest,
-  buildCollectionManifest,
+  appendNfts,
+  buildCollectionMetadata,
   normalizeTraitDefinitions,
-} from "./collection-manifest";
+} from "@/features/lib/metadata";
 
 const nft = (n: number) => ({
   name: `OTTERS #${n}`,
@@ -22,21 +22,21 @@ const base = {
 
 describe("collection manifest", () => {
   it("contains the complete metadata of every NFT", () => {
-    const manifest = buildCollectionManifest({ ...base, nfts: [nft(1), nft(2)] });
+    const manifest = buildCollectionMetadata({ ...base, nfts: [nft(1), nft(2)] });
     expect(manifest.nfts).toHaveLength(2);
     expect(manifest.nfts[0]).toEqual(nft(1));
     expect(Object.keys(manifest.nfts[0]!)).not.toContain("metadata");
   });
 
   it("appends new NFTs while keeping the complete set", () => {
-    const v1 = buildCollectionManifest({ ...base, nfts: [nft(1), nft(2)] });
-    const v2 = appendNftsToManifest(v1, [nft(3)]);
+    const v1 = buildCollectionMetadata({ ...base, nfts: [nft(1), nft(2)] });
+    const v2 = appendNfts(v1, [nft(3)]);
     expect(v2.nfts.map((n) => n.name)).toEqual(["OTTERS #1", "OTTERS #2", "OTTERS #3"]);
     expect(v2.traits).toEqual(v1.traits);
   });
 
   it("rejects incomplete manifests", () => {
-    expect(() => buildCollectionManifest({ ...base, description: "", nfts: [nft(1)] })).toThrow(
+    expect(() => buildCollectionMetadata({ ...base, description: "", nfts: [nft(1)] })).toThrow(
       /description/,
     );
   });

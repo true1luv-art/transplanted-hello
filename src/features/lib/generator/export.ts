@@ -10,7 +10,7 @@
  */
 import { zipSync, type Zippable } from "fflate";
 import { splitBatches, BATCH_SIZE } from "./batching";
-import { collectionMetadataDocument, nftMetadataDocument, toJsonBytes } from "./metadata";
+import { collectionMetadataFromProject, toNftMetadata, toJsonBytes } from "@/features/lib/metadata";
 import { collectionSlug } from "./naming";
 import type {
   ExportBatch,
@@ -32,7 +32,7 @@ export function buildCollectionArchive(
 ): ExportFile {
   const bytes = zip({
     metadata: {
-      "metadata.json": toJsonBytes(collectionMetadataDocument(settings, layers, nfts)),
+      "metadata.json": toJsonBytes(collectionMetadataFromProject(settings, layers, nfts)),
     },
   });
   return { filename: COLLECTION_ARCHIVE_NAME, bytes, count: 0, kind: "collection" };
@@ -51,7 +51,7 @@ export function buildBatchArchive(
   for (const tokenId of batch.tokenIds) {
     const nft = byToken.get(tokenId);
     if (!nft) throw new Error(`Missing generated NFT #${tokenId}`);
-    metadataFolder[nft.metadataFilename] = toJsonBytes(nftMetadataDocument(nft));
+    metadataFolder[nft.metadataFilename] = toJsonBytes(toNftMetadata(nft));
     const image = images.get(tokenId);
     if (!image) throw new Error(`Missing exported image for NFT #${tokenId}`);
     imageFolder[nft.imageFilename] = image;

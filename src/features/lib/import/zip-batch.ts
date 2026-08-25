@@ -29,8 +29,8 @@ import {
   type ZipSource,
 } from "./zip";
 import type { ImportIssue, ImportReport, ParsedMetadataRecord } from "./types";
-import { normalizeTraitDefinitions } from "@/features/lib/storage/collection-manifest";
-import type { CollectionTraitValue } from "@/features/lib/generator/metadata";
+import { normalizeTraitDefinitions } from "@/features/lib/metadata";
+import type { TraitDefinition } from "@/features/lib/metadata";
 
 /* ------------------------------------------------------------------ */
 /* collection metadata archive                                         */
@@ -51,7 +51,7 @@ export interface CollectionMetadataImport {
   width: number | null;
   height: number | null;
   /** Complete configured trait system declared by the manifest. */
-  traits: Record<string, CollectionTraitValue[]> | undefined;
+  traits: Record<string, TraitDefinition[]> | undefined;
   issues: ImportIssue[];
   valid: boolean;
 }
