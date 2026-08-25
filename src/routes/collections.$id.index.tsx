@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BarChart3, LineChart, Search } from "lucide-react";
 
@@ -17,6 +17,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppStore } from "@/features/stores/app-store";
+import { loadIpfsNftAttributes } from "@/features/lib/storage/ipfs-metadata";
+import type { NFTAttribute } from "@/features/types/domain/nfts";
 import { cn } from "@/lib/utils";
 
 const STATUS_FILTERS = ["All items", "For sale", "Not listed"] as const;
@@ -44,6 +46,9 @@ function CollectionDetail() {
   const [query, setQuery] = useState("");
   const [mintOpen, setMintOpen] = useState(false);
   const [traitsOpen, setTraitsOpen] = useState(false);
+  const [mintedAttributes, setMintedAttributes] = useState<NFTAttribute[][]>([]);
+  const [traitsLoading, setTraitsLoading] = useState(false);
+  const [traitsFailed, setTraitsFailed] = useState(0);
 
   const priceOf = (nftId: string) => listings.find((l) => l.nftId === nftId)?.price;
 
@@ -70,6 +75,36 @@ function CollectionDetail() {
   }, [nfts, id, status, listings, sort, query]);
 
   const allItems = useMemo(() => nfts.filter((n) => n.collectionId === id), [nfts, id]);
+
+  useEffect(() => {
+    if (!traitsOpen) return;
+    const controller = new AbortController();
+    setTraitsLoading(true);
+    setTraitsFailed(0);
+
+    void Promise.allSettled(
+      allItems.map((nft) => {
+        // `metadataUri` is the canonical IPFS reference. Legacy local records
+        // may still carry serialized JSON in `properties.metadata`.
+        const metadataUri = nft.metadataUri || nft.properties?.metadata;
+        if (!metadataUri) return Promise.reject(new Error("Minted NFT has no metadata URI"));
+        return loadIpfsNftAttributes(metadataUri, controller.signal);
+      }),
+    ).then((results) => {
+      if (controller.signal.aborted) return;
+      const loaded: NFTAttribute[][] = [];
+      let failed = 0;
+      for (const result of results) {
+        if (result.status === "fulfilled") loaded.push(result.value);
+        else failed += 1;
+      }
+      setMintedAttributes(loaded);
+      setTraitsFailed(failed);
+      setTraitsLoading(false);
+    });
+
+    return () => controller.abort();
+  }, [allItems, traitsOpen]);
 
   const forSaleCount = useMemo(
     () =>
@@ -178,7 +213,12 @@ function CollectionDetail() {
             <DialogDescription>How often each trait appears across minted items.</DialogDescription>
           </DialogHeader>
           <div className="max-h-[70vh] overflow-y-auto px-6 py-5">
-            <RarityChart layers={collection.traitLayers ?? []} nfts={allItems} />
+            <RarityChart
+              layers={collection.traitLayers ?? []}
+              mintedAttributes={mintedAttributes}
+              loading={traitsLoading}
+              failedCount={traitsFailed}
+            />
           </div>
         </DialogContent>
       </Dialog>
