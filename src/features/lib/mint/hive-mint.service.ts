@@ -322,8 +322,9 @@ export async function mintNftAsset(input: MintNftAssetInput): Promise<MintNftAss
       // RPC unreachable for the balance check must not block the signature.
     }
 
-    // 3. Chain-facing metadata: a STRING, exactly as stored on IPFS.
-    const metadataString = JSON.stringify(metadata);
+    // 3. Chain-facing metadata: the IPFS URI ONLY. Hive Engine caps every NFT
+    //    property at 100 characters, so the document itself never goes on chain.
+    const metadataUri = asset.metadataUri;
 
     // 4. The ISSUER account signs and broadcasts the real Hive transaction.
     //    The private key stays on the server — the browser only sends data.
