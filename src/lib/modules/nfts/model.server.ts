@@ -227,7 +227,7 @@ export function toNftView(doc: NftDocument): NFT {
     NftMintedNumber: doc.NFTokenID ?? null,
     properties: buildNftProperties({
       collection: doc.collectionName,
-      symbol: doc.collectionSymbol ?? doc.collectionName,
+      symbol: doc.collectionName,
       metadataUri: doc.metadataUri,
     }),
   };
