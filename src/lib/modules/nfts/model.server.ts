@@ -6,7 +6,8 @@ import { generateTraits } from "@/features/lib/traits/generator";
 import { calculateRarityScore } from "@/features/lib/traits/rarity";
 import { DEFAULT_TRAIT_LAYERS } from "@/features/lib/traits/presets";
 import type { GeneratedTrait } from "@/features/lib/traits/types";
-import type { NFT, NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
+import type { NFT } from "@/features/types/domain/nfts";
 import type { CollectionDocument } from "../collections/types.server";
 import type { NftAssetDocument } from "../nft-assets/types.server";
 import type { NftDocument, NftDocumentStatus } from "./types.server";
@@ -90,7 +91,7 @@ export function hiveNftId(symbol: string, tokenId: number): string {
 export const HELD_STATUSES: readonly NftDocumentStatus[] = ["owned", "listed"];
 
 function attributesFromTraits(traits: GeneratedTrait[]): NFTAttribute[] {
-  return traits.map((trait) => ({ trait: trait.layerName, value: trait.traitValueName }));
+  return traits.map((trait) => ({ trait_type: trait.layerName, value: trait.traitValueName }));
 }
 
 export interface CreateNftInput {

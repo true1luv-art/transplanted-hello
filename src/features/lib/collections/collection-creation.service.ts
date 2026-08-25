@@ -45,7 +45,7 @@ export interface ImportedNftRecord {
   image: string;
   imageUri: string;
   metadataUri: string;
-  attributes: { trait: string; value: string | number }[];
+  attributes: NFTAttribute[];
   rarityScore: number;
   rarityRank: number;
   /** untouched source metadata document */

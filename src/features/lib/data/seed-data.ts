@@ -7,7 +7,8 @@ import type { GeneratedToken, GeneratedTrait } from "@/features/lib/traits/types
 import type { Activity, Transaction } from "@/features/types/domain/activity";
 import type { Collection } from "@/features/types/domain/collections";
 import type { Listing } from "@/features/types/domain/marketplace";
-import type { NFT, NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
+import type { NFT } from "@/features/types/domain/nfts";
 import type { User } from "@/features/types/domain/users";
 import { hiveAvatarUrl } from "@/lib/chain/identity";
 
@@ -203,7 +204,7 @@ export function rarityMultiplier(rank: number, total: number): number {
 
 /** Generated traits -> metadata attributes. Attributes always mirror traits. */
 export function traitsToAttributes(traits: GeneratedTrait[]): NFTAttribute[] {
-  return traits.map((trait) => ({ trait: trait.layerName, value: trait.traitValueName }));
+  return traits.map((trait) => ({ trait_type: trait.layerName, value: trait.traitValueName }));
 }
 
 /**

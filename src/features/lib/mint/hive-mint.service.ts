@@ -20,7 +20,8 @@ import { mintTransactionsRepository } from "@/features/mocks/data/mint-transacti
 import { usersRepository } from "@/features/mocks/data/users/repository";
 import type { Collection } from "@/features/types/domain/collections";
 import type { NftAsset } from "@/features/types/domain/nft-assets";
-import type { NFT, NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
+import type { NFT } from "@/features/types/domain/nfts";
 import type { MintProgress, MintTransactionRecord } from "@/features/types/domain/mint";
 
 export class MintError extends Error {
@@ -150,9 +151,9 @@ function toMintedNft(params: {
     description: metadata.description || asset.description,
     image: asset.imageUri ?? metadata.image ?? collection.image,
     traits: (asset.attributes ?? []).map((attribute) => ({
-      layerId: attribute.trait,
-      layerName: attribute.trait,
-      traitValueId: `${attribute.trait}:${attribute.value}`,
+      layerId: attribute.trait_type,
+      layerName: attribute.trait_type,
+      traitValueId: `${attribute.trait_type}:${attribute.value}`,
       traitValueName: String(attribute.value),
       weight: 0,
       probability: 0,

@@ -61,9 +61,9 @@ function assetToNft(
     description: asset.description,
     image: asset.imageUri ?? collection.image,
     traits: (asset.attributes ?? []).map((attribute) => ({
-      layerId: attribute.trait,
-      layerName: attribute.trait,
-      traitValueId: `${attribute.trait}:${attribute.value}`,
+      layerId: attribute.trait_type,
+      layerName: attribute.trait_type,
+      traitValueId: `${attribute.trait_type}:${attribute.value}`,
       traitValueName: String(attribute.value),
       weight: 0,
       probability: 0,

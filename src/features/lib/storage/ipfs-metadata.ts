@@ -1,4 +1,4 @@
-import type { NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
 
 import { resolveIpfsUrl } from "./ipfs-uri";
 
@@ -14,7 +14,7 @@ export function normalizeNftAttributes(value: unknown): NFTAttribute[] {
     const valueValue = record["value"];
     if (typeof traitValue !== "string" || !traitValue.trim()) continue;
     if (typeof valueValue !== "string" && typeof valueValue !== "number") continue;
-    attributes.push({ trait: traitValue.trim(), value: valueValue });
+    attributes.push({ trait_type: traitValue.trim(), value: String(valueValue) });
   }
   return attributes;
 }

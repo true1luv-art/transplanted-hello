@@ -1,5 +1,5 @@
 import type { HiveNftProperties } from "@/lib/chain/nft-properties";
-import type { NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
 
 /**
  * Prepared, UNMINTED NFT record — the client mirror of the `nft-assets`

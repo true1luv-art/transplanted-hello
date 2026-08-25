@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAppStore } from "@/features/stores/app-store";
 import { loadIpfsNftAttributes } from "@/features/lib/storage/ipfs-metadata";
-import type { NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
 import { cn } from "@/lib/utils";
 
 const STATUS_FILTERS = ["All items", "For sale", "Not listed"] as const;

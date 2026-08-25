@@ -1,5 +1,5 @@
 import type { GeneratedTrait } from "@/features/lib/traits/types";
-import type { NFTAttribute } from "@/features/types/domain/nfts";
+import type { NFTAttribute } from "@/features/lib/metadata";
 
 export type NftDocumentStatus = "owned" | "listed" | "burned";
 

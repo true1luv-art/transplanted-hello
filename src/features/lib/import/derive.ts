@@ -33,5 +33,5 @@ export function traitLayersFromImport(report: ImportReport): TraitLayerConfig[] 
 
 /** `attributes` in the shape the app's NFT records use. */
 export function toNftAttributes(attributes: { trait_type: string; value: string | number }[]) {
-  return attributes.map((attribute) => ({ trait: attribute.trait_type, value: attribute.value }));
+  return attributes.map((attribute) => ({ trait_type: attribute.trait_type, value: attribute.value }));
 }
