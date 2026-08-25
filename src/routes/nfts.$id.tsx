@@ -151,8 +151,8 @@ function NftDetail() {
                 Rank #{nft.rarityRank}
               </span>
               <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                <Crown className="size-4 text-primary" />
-                {collection?.creatorFee ?? 0}%
+                <Trophy className="size-4 text-primary" />
+                {nft.rarityScore.toFixed(0)} / {maxScore.toFixed(0)} pts
               </span>
               <span className="ml-auto text-muted-foreground">
                 Owned by: <span className="text-foreground">@{nft.owner}</span>
